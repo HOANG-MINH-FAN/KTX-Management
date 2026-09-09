@@ -1,0 +1,87 @@
+.main_text{
+    margin: 45px;
+}
+.room_form, .allocation_form, .student_form{
+    width: 100%;
+    display: flex;
+    gap: 40px;
+    margin: 45px;
+    align-items: center;
+}
+.room_form input, .student_form input, .allocation_form input, .allocation_form select{
+    width: 180px;
+    margin-left: 5px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    border: 1px solid #000;
+    outline: none;
+    background: rgba(255,255,255,0.35);
+    color: #000000;
+}
+.allocation_form select{
+    width: 210px;
+}
+.student_form input{
+    width: 130px;
+    margin-left: 0;
+}
+.student_form div{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.room_form button, .allocation_form button, .student_form button{
+    width: 120px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    background: rgba(0, 170, 2, 0.9);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+}
+.student_form button{
+    margin-top: 15px;
+}
+
+.table{
+    margin: 20px 45px;
+    border: 1px solid #999999;
+    border-collapse: collapse;
+}
+.table th,
+.table td{
+    width: 150px;
+    height: 35px;
+    border: 1px solid #999999;
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 18px;
+}
+
+.allocation_table th,
+.allocation_table td{
+    width: 200px;
+}
+.allocation_table th:last-child,
+.allocation_table td:last-child{
+    width: 225px;
+}
+.table_btn{
+    width: 120px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    background: rgb(255, 98, 64);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    margin-left: 15px;
+}
+.allocation_table_btn{
+    width: 70px;
+    padding: 8px 0;
+    margin-left: 0;
+}

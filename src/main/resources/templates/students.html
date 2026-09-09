@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Students</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/input.css">
+</head>
+<body>
+    <div th:replace="header :: header"></div>
+
+    <h1 class="main_text">Students</h1>
+
+    <form action="/students/save" method="post" class="student_form">
+        <div><label>Student ID:</label><input name="studentID" required></div>
+        <div><label>Full Name:</label><input name="fullName" required></div>
+        <div><label>Phone:</label><input name="phone"></div>
+        <div><label>Email:</label><input name="email"></div>
+        <div><label>Faculty:</label><input name="faculty"></div>
+        <button type="submit">Add</button>
+    </form>
+
+
+    <table class="table">
+        <tr>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Faculty</th>
+            <th>Actions</th>
+        </tr>
+
+        <tr th:each="s : ${students}">
+            <td th:text="${s.id}"></td>
+            <td th:text="${s.studentID}"></td>
+            <td th:text="${s.fullName}"></td>
+            <td th:text="${s.phone}"></td>
+            <td th:text="${s.email}"></td>
+            <td th:text="${s.faculty}"></td>
+            <td>
+                <form th:action="@{'/students/delete/' + ${s.id}}" method="post" style="display:inline;">
+                    <button type="submit" class="table_btn">Delete</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

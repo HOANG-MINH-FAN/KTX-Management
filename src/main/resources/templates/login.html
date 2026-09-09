@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <div th:replace="header :: header"></div>
+
+    <img src="/images/dorm_background.jpg" alt="background"  class="login_background">
+
+    <div class="login_forms">
+
+        <section class="login">
+            <h2 class="title">Login</h2>
+
+            <form class="form" method="post" action="/login">
+                <label class="field">
+                    <span class="label">Username</span>
+                    <input class="input" type="text" name="username" placeholder="Enter username" required>
+                </label>
+
+                <label class="field">
+                    <span class="label">Password</span>
+                    <input class="input" type="password" name="password" placeholder="Enter password" required>
+                </label>
+
+                <p style="color:red" th:text="${error}"></p>
+                <p style="color:green" th:text="${success}"></p>
+
+                <button class="btn" type="submit">Login</button>
+            </form>
+        </section>
+
+        <section class="registration">
+            <h2 class="title">Registration</h2>
+
+            <form class="form" method="post" action="/register">
+                <label class="field">
+                    <span class="label">Username</span>
+                    <input class="input" type="text" name="username" placeholder="Enter username" required>
+                </label>
+
+                <label class="field">
+                    <span class="label">Password</span>
+                    <input class="input" type="password" name="password" placeholder="Enter password" required>
+                </label>
+
+                <p style="color:red" th:text="${error}"></p>
+                <p style="color:green" th:text="${success}"></p>
+
+                <button class="btn" type="submit">Create</button>
+            </form>
+        </section>
+
+    </div>
+
+</body>
+</html>

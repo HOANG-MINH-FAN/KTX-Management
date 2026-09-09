@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rooms</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/input.css">
+</head>
+<body>
+
+    <div th:replace="header :: header"></div>
+
+    <h1 class="main_text">Rooms</h1>
+
+    <form action="/rooms/save" method="post" class="room_form">
+        <div><label>Building:</label><input type="text" name="building" required></div>
+        <div><label>Room:</label><input type="text" name="roomNumber" required></div>
+        <div><label>Floor:</label><input type="number" name="floor" required></div>
+        <div><label>Capacity:</label><input type="number" name="capacity" required></div>
+        <button type="submit">Add Room</button>
+    </form>
+
+    <table class="table">
+        <tr>
+            <th>ID</th>
+            <th>Building</th>
+            <th>Room</th>
+            <th>Floor</th>
+            <th>Capacity</th>
+            <th>Occupied</th>
+            <th>Status</th>
+        </tr>
+
+        <tr th:each="r : ${rooms}">
+            <td th:text="${r.id}"></td>
+            <td th:text="${r.building}"></td>
+            <td th:text="${r.roomNumber}"></td>
+            <td th:text="${r.floor}"></td>
+            <td th:text="${r.capacity}"></td>
+            <td th:text="${r.occupied}"></td>
+            <td th:text="${r.status}"></td>
+            <td>
+                <form th:action="@{'/rooms/delete/' + ${r.id}}" method="post" style="display:inline;">
+                    <button type="submit" class="table_btn">Delete</button>
+                </form>
+            </td>
+        </tr>
+
+    </table>
+
+</body>
+</html>
