@@ -1,103 +1,87 @@
-# Dormitory Information System (ITEC313)
+# 🏠 Dormitory Management System
 
-A Spring Boot web application for managing dormitory students, rooms, and room allocations.
+Website quản lý ký túc xá sinh viên được xây dựng bằng Java Spring Boot, MySQL và Thymeleaf.
 
-## Tech Stack
+## 🛠 Công nghệ
 
-- Java 17
-- Spring Boot 4.0.1 (Spring Web MVC, Spring Data JPA, Thymeleaf)
-- MySQL (via `mysql-connector-j`)
+- Java
+- Spring Boot
+- Spring Data JPA
+- MySQL
+- Thymeleaf
 - Maven
 
-## Prerequisites
+## 🚀 Tải dự án lần đầu
 
-- JDK 17+
-- Maven (or use the included `mvnw` / `mvnw.cmd` wrapper)
-- MySQL Server 8+ running locally
-- A MySQL client (MySQL Workbench, phpMyAdmin, or the `mysql` CLI)
+```bash
+git clone https://github.com/HOANG-MINH-FAN/KTX-Management.git
+cd KTX-Management
+```
 
-## Database Setup
+## 🗄 Cài đặt Database
 
-The application does **not** auto-create its schema
-(`spring.jpa.hibernate.ddl-auto=none`), so the database must be created manually
-before the first run.
+1. Mở MySQL Workbench.
+2. Chạy file `dormitory_db.sql`.
+3. Kiểm tra thông tin MySQL trong:
 
-1. Make sure your MySQL server is running.
-2. Run the included `dormitory_db.sql` script to create the database and tables:
-
-   ```bash
-   mysql -u root -p < dormitory_db.sql
-   ```
-
-   Or, in phpMyAdmin: **Import** → select `dormitory_db.sql` → **Go**.
-
-   This creates the `dormitory_db` database along with the following tables:
-
-   | Table | Purpose |
-   |---|---|
-   | `admins` | Admin login accounts |
-   | `students` | Student records |
-   | `rooms` | Dormitory rooms and capacity |
-   | `allocations` | Links students to rooms (check-in date, status) |
-
-   The script also inserts a default admin account and a couple of sample rows so you have something to log in with and look at right away.
-
-3. **Default login:**
-   - Username: `admin`
-   - Password: `admin123`
-
-   Change this after first login, or edit the row directly in the `admins` table.
-
-## Application Configuration
-
-Database connection settings are in `src/main/resources/application.properties`:
+`src/main/resources/application.properties`
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/dormitory_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring.datasource.url=jdbc:mysql://localhost:3306/dormitory_db
 spring.datasource.username=root
-spring.datasource.password=
-
-spring.jpa.hibernate.ddl-auto=none
-spring.jpa.show-sql=true
-
-server.port=8080
+spring.datasource.password=YOUR_PASSWORD
 ```
 
-Update `spring.datasource.username` / `spring.datasource.password` to match your local MySQL credentials before running the app.
+## ▶️ Chạy chương trình
 
-## Running the Application
+Trên Windows:
 
 ```bash
-# from the project root (where pom.xml lives)
-./mvnw spring-boot:run
+.\mvnw.cmd spring-boot:run
 ```
 
-On Windows:
+Sau đó truy cập:
+
+```text
+http://localhost:8080
+```
+
+## 🔄 Lấy và đẩy code
+
+Trước khi làm:
 
 ```bash
-mvnw.cmd spring-boot:run
+git pull origin main
 ```
 
-The app will start on **http://localhost:8080**.
+Sau khi làm xong:
 
-## Project Structure
-
-```
-src/main/java/com/dormitory/
-├── DormitoryApplication.java     # Spring Boot entry point
-├── controller/                   # MVC controllers (Admin, Student, Room, Allocation, Home)
-├── entity/                       # JPA entities (Admin, Student, Room, Allocation)
-└── repository/                   # Spring Data JPA repositories
-
-src/main/resources/
-├── application.properties        # DB connection config
-├── templates/                    # Thymeleaf HTML views
-└── static/                       # CSS and images
-
-dormitory_db.sql                  # Database schema + seed data (this file)
+```bash
+git add .
+git commit -m "Mô tả thay đổi"
+git pull origin main
+git push origin main
 ```
 
-## Notes
+> ⚠️ Luôn `git pull` trước khi code và trước khi `git push` để hạn chế conflict.
 
-- Passwords in the `admins` table are currently stored and compared as plain text (see `AdminController`). This is fine for a class project/demo, but should not be used as-is in production — consider hashing passwords (e.g. with BCrypt) if you extend this further.
-- If you change entity field mappings in the Java code, remember to keep `dormitory_db.sql` in sync since the schema is managed manually.
+## 📁 Cấu trúc chính
+
+```text
+src/
+└── main/
+    ├── java/com/dormitory/
+    │   ├── controller/
+    │   ├── entity/
+    │   └── repository/
+    └── resources/
+        ├── templates/
+        └── static/
+```
+
+## 👥 Quy tắc làm việc nhóm
+
+- Không tự ý xóa hoặc sửa code của người khác.
+- Mỗi thành viên phụ trách một chức năng.
+- Commit ghi rõ nội dung thay đổi.
+- Nếu xảy ra conflict, báo nhóm trước khi xử lý.
