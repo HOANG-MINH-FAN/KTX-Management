@@ -1,103 +1,148 @@
-# Dormitory Information System (ITEC313)
+# 🏠 QUẢN LÝ KÝ TÚC XÁ
 
-A Spring Boot web application for managing dormitory students, rooms, and room allocations.
+Website quản lý ký túc xá sinh viên.
 
-## Tech Stack
+## 1. Công nghệ sử dụng
 
-- Java 17
-- Spring Boot 4.0.1 (Spring Web MVC, Spring Data JPA, Thymeleaf)
-- MySQL (via `mysql-connector-j`)
+- Java
+- Spring Boot
+- MySQL
+- Thymeleaf
 - Maven
 
-## Prerequisites
+---
 
-- JDK 17+
-- Maven (or use the included `mvnw` / `mvnw.cmd` wrapper)
-- MySQL Server 8+ running locally
-- A MySQL client (MySQL Workbench, phpMyAdmin, or the `mysql` CLI)
+## 2. Lấy code về máy lần đầu
 
-## Database Setup
+Mở Terminal tại thư mục muốn lưu project:
 
-The application does **not** auto-create its schema
-(`spring.jpa.hibernate.ddl-auto=none`), so the database must be created manually
-before the first run.
+```bash
+git clone https://github.com/USERNAME/KTX-Management.git
+```
 
-1. Make sure your MySQL server is running.
-2. Run the included `dormitory_db.sql` script to create the database and tables:
+Sau đó mở thư mục project:
 
-   ```bash
-   mysql -u root -p < dormitory_db.sql
-   ```
+```bash
+cd KTX-Management
+```
 
-   Or, in phpMyAdmin: **Import** → select `dormitory_db.sql` → **Go**.
+---
 
-   This creates the `dormitory_db` database along with the following tables:
+## 3. Cài Database
 
-   | Table | Purpose |
-   |---|---|
-   | `admins` | Admin login accounts |
-   | `students` | Student records |
-   | `rooms` | Dormitory rooms and capacity |
-   | `allocations` | Links students to rooms (check-in date, status) |
+### Bước 1
+Mở **MySQL Workbench** và đăng nhập vào MySQL.
 
-   The script also inserts a default admin account and a couple of sample rows so you have something to log in with and look at right away.
+### Bước 2
+Mở file:
 
-3. **Default login:**
-   - Username: `admin`
-   - Password: `admin123`
+```text
+dormitory_db.sql
+```
 
-   Change this after first login, or edit the row directly in the `admins` table.
+Sau đó chạy toàn bộ file để tạo Database.
 
-## Application Configuration
+### Bước 3
+Mở file:
 
-Database connection settings are in `src/main/resources/application.properties`:
+```text
+src/main/resources/application.properties
+```
+
+Kiểm tra thông tin MySQL:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/dormitory_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 spring.datasource.username=root
 spring.datasource.password=
-
-spring.jpa.hibernate.ddl-auto=none
-spring.jpa.show-sql=true
-
-server.port=8080
 ```
 
-Update `spring.datasource.username` / `spring.datasource.password` to match your local MySQL credentials before running the app.
+- `username` thường là `root`.
+- `password` phải nhập **mật khẩu MySQL của máy mình**.
+- Mỗi thành viên có thể có mật khẩu MySQL khác nhau.
 
-## Running the Application
+
+> ⚠️ Chỉ sửa mật khẩu trên máy của mình. Không push mật khẩu cá nhân lên GitHub.
+
+---
+
+## 4. Chạy Website
+
+Mở Terminal trong thư mục project và chạy:
 
 ```bash
-# from the project root (where pom.xml lives)
-./mvnw spring-boot:run
+.\mvnw.cmd spring-boot:run
 ```
 
-On Windows:
+Nếu chạy thành công, mở trình duyệt:
+
+```text
+http://localhost:8080
+```
+
+---
+
+## 5. Khi bắt đầu code
+
+**Luôn lấy code mới nhất trước:**
 
 ```bash
-mvnw.cmd spring-boot:run
+git pull origin main
 ```
 
-The app will start on **http://localhost:8080**.
+Sau đó mới bắt đầu code.
 
-## Project Structure
+---
 
+## 6. Khi code xong
+
+### Bước 1: Kiểm tra code
+
+Chạy thử website và đảm bảo không bị lỗi.
+
+### Bước 2: Đưa code lên GitHub
+
+```bash
+git add .
 ```
+
+```bash
+git commit -m "Mô tả nội dung đã thay đổi"
+```
+
+```bash
+git pull origin main
+```
+
+```bash
+git push origin main
+```
+
+---
+
+## 7. Lưu ý
+
+- Không code khi chưa `git pull`.
+- Không tự ý xóa hoặc sửa code của thành viên khác.
+- Code xong phải chạy thử trước khi `git push`.
+- Nếu Git báo **conflict**, không tự ý xóa phần code của người khác.
+- Không push mật khẩu MySQL cá nhân lên GitHub.
+- Khi commit nên ghi rõ nội dung đã thay đổi.
+
+---
+
+## 8. Các thư mục chính
+
+```text
 src/main/java/com/dormitory/
-├── DormitoryApplication.java     # Spring Boot entry point
-├── controller/                   # MVC controllers (Admin, Student, Room, Allocation, Home)
-├── entity/                       # JPA entities (Admin, Student, Room, Allocation)
-└── repository/                   # Spring Data JPA repositories
+├── controller/    → Xử lý yêu cầu từ website
+├── entity/        → Các đối tượng Sinh viên, Phòng,...
+└── repository/    → Làm việc với Database
 
 src/main/resources/
-├── application.properties        # DB connection config
-├── templates/                    # Thymeleaf HTML views
-└── static/                       # CSS and images
-
-dormitory_db.sql                  # Database schema + seed data (this file)
+├── templates/     → Các trang HTML
+└── static/        → CSS, hình ảnh,...
 ```
 
-## Notes
+## ⭐ Quy tắc đơn giản
 
-- Passwords in the `admins` table are currently stored and compared as plain text (see `AdminController`). This is fine for a class project/demo, but should not be used as-is in production — consider hashing passwords (e.g. with BCrypt) if you extend this further.
-- If you change entity field mappings in the Java code, remember to keep `dormitory_db.sql` in sync since the schema is managed manually.
+**Pull → Code → Test → Commit → Pull → Push**
