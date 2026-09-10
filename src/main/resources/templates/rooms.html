@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Rooms</title>
+    <title>Phòng</title>
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/input.css">
 </head>
@@ -10,25 +10,25 @@
 
     <div th:replace="header :: header"></div>
 
-    <h1 class="main_text">Rooms</h1>
+    <h1 class="main_text">Quản lý phòng</h1>
 
     <form action="/rooms/save" method="post" class="room_form">
-        <div><label>Building:</label><input type="text" name="building" required></div>
-        <div><label>Room:</label><input type="text" name="roomNumber" required></div>
-        <div><label>Floor:</label><input type="number" name="floor" required></div>
-        <div><label>Capacity:</label><input type="number" name="capacity" required></div>
-        <button type="submit">Add Room</button>
+        <div><label>Tòa nhà:</label><input type="text" name="building" required></div>
+        <div><label>Phòng:</label><input type="text" name="roomNumber" required></div>
+        <div><label>Tầng:</label><input type="number" name="floor" required></div>
+        <div><label>Sức chứa:</label><input type="number" name="capacity" required></div>
+        <button type="submit">Thêm phòng</button>
     </form>
 
     <table class="table">
         <tr>
             <th>ID</th>
-            <th>Building</th>
-            <th>Room</th>
-            <th>Floor</th>
-            <th>Capacity</th>
-            <th>Occupied</th>
-            <th>Status</th>
+            <th>Tòa nhà</th>
+            <th>Phòng</th>
+            <th>Tầng</th>
+            <th>Sức chứa</th>
+            <th>Đã sử dụng</th>
+            <th>Trạng thái</th>
         </tr>
 
         <tr th:each="r : ${rooms}">
@@ -41,7 +41,7 @@
             <td th:text="${r.status}"></td>
             <td>
                 <form th:action="@{'/rooms/delete/' + ${r.id}}" method="post" style="display:inline;">
-                    <button type="submit" class="table_btn">Delete</button>
+                    <button type="submit" class="table_btn">Xóa</button>
                 </form>
             </td>
         </tr>

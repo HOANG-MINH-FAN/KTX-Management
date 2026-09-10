@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Allocations</title>
+    <title>Phân phòng</title>
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/input.css">
 </head>
@@ -10,31 +10,31 @@
 
     <div th:replace="header :: header"></div>
 
-    <h1  class="main_text">Allocations</h1>
+    <h1  class="main_text">Quản lý phân phòng</h1>
 
     <form action="/allocations/checkin" method="post"  class="allocation_form">
         <div>
-            <label>Student:</label>
+            <label>Sinh viên:</label>
             <select name="studentId" required>
-                <option value="">select student</option>
+                <option value="">Chọn sinh viên</option>
                 <option th:each="s : ${students}" th:value="${s.id}" th:text="${s.studentID + ' - ' + s.fullName}"></option>
             </select>
         </div>
 
         <div>
-            <label>Room:</label>
+            <label>Phòng:</label>
             <select name="roomId" required>
-                <option value="">select room</option>
+                <option value="">Chọn phòng</option>
                 <option th:each="r : ${rooms}" th:value="${r.id}" th:text="${r.building + '-' + r.roomNumber + ' (capacity: ' + r.capacity + ', occupied: ' + r.occupied + ')'}"></option>
             </select>
         </div>
 
         <div>
-            <label>Date:</label>
+            <label>Ngày nhận phòng:</label>
             <input type="date" name="checkInDate" th:value="${today}" required>
         </div>
 
-        <button type="submit">Check-in</button>
+        <button type="submit">Nhận phòng</button>
         <div th:if="${error}" style="color:red; font-weight:bold;" th:text="${error}"></div>
     </form>
 
@@ -42,11 +42,11 @@
     <table class="table allocation_table">
         <tr>
             <th>ID</th>
-            <th>Student</th>
-            <th>Room</th>
-            <th>Check-in Date</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>Sinh viên</th>
+            <th>Phòng</th>
+            <th>Ngày nhận phòng</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
         </tr>
 
         <tr th:each="a : ${allocations}">
@@ -57,15 +57,15 @@
             <td th:text="${a.status}"></td>
             <td>
                 <form th:action="@{'/allocations/paid/' + ${a.id}}" method="post" style="display:inline;">
-                    <button class="table_btn allocation_table_btn" style="background: rgb(0, 170, 2, 0.9)" type="submit">PAID</button>
+                    <button class="table_btn allocation_table_btn" style="background: rgb(0, 170, 2, 0.9)" type="submit">ĐÃ THANH TOÁN</button>
                 </form>
 
                 <form th:action="@{'/allocations/unpaid/' + ${a.id}}" method="post" style="display:inline;">
-                    <button class="table_btn allocation_table_btn" style="background: rgb(220,176,0)" type="submit">UNPAID</button>
+                    <button class="table_btn allocation_table_btn" style="background: rgb(220,176,0)" type="submit">CHƯA THANH TOÁN</button>
                 </form>
 
                 <form th:action="@{'/allocations/delete/' + ${a.id}}" method="post" style="display:inline;">
-                    <button class="table_btn allocation_table_btn" style="background: rgb(255, 98, 64)" type="submit">DELETE</button>
+                    <button class="table_btn allocation_table_btn" style="background: rgb(255, 98, 64)" type="submit">XÓA</button>
                 </form>
             </td>
         </tr>

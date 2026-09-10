@@ -3,34 +3,34 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Dormitory Information System</title>
+    <title>Hệ thống quản lý ký túc xá</title>
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
     <div th:replace="header :: header"></div>
-    <h1 class="welcome_text">Welcome to Dormitory Information System!</h1>
+    <h1 class="welcome_text">Chào mừng tới hệ thống quản lý ký túc xá!</h1>
 
     <div class="dorm_info_container">
         <div class="info_block">
             <div class="count" th:text="${totalRooms}"></div>
-            <div class="info_text">Total Rooms</div>
+            <div class="info_text">Tổng số phòng</div>
         </div>
 
         <div class="info_block">
             <div class="count" th:text="${totalStudents}"></div>
-            <div class="info_text">Total Student</div>
+            <div class="info_text">Tổng số sinh viên</div>
         </div>
 
         <div class="info_block">
             <div class="count" th:text="${emptyPlaces}"></div>
-            <div class="info_text">Total Empty Places</div>
+            <div class="info_text">Số vị trí trống</div>
         </div>
 
         <div class="info_block">
             <div class="count" th:text="${unpaid}"></div>
-            <div class="info_text">Unpaid Invoices</div>
+            <div class="info_text">Chưa thanh toán</div>
         </div>
     </div>
 
