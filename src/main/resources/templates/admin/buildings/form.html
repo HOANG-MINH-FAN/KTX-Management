@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Thêm/Sửa Tòa nhà')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title" th:text="${building.id != null} ? 'Chỉnh sửa tòa nhà' : 'Thêm tòa nhà mới'"></div>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/buildings}">← Quay lại</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+            <div class="card" style="max-width:560px;">
+                <div class="card-header"><span class="card-title">🏢 Thông tin tòa nhà</span></div>
+                <div class="card-body">
+                    <form th:action="@{/admin/buildings/save}" method="post">
+                        <input type="hidden" name="id" th:value="${building.id}">
+                        <div class="form-group">
+                            <label class="form-label">Tên tòa nhà *</label>
+                            <input class="form-control" type="text" name="name" th:value="${building.name}" required placeholder="VD: Tòa A">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Địa chỉ / Vị trí</label>
+                            <input class="form-control" type="text" name="address" th:value="${building.address}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số tầng *</label>
+                            <input class="form-control" type="number" name="totalFloors" th:value="${building.totalFloors ?: 4}" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" name="description" rows="3" th:text="${building.description}"></textarea>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <button class="btn btn-primary" type="submit">💾 Lưu</button>
+                            <a class="btn btn-ghost" th:href="@{/admin/buildings}">Hủy</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

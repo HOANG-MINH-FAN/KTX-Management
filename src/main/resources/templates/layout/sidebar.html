@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- ============================================================
+     LAYOUT FRAGMENT: sidebar + topbar
+     Sử dụng: th:replace="~{layout/sidebar :: layout(~{::content})}"
+     ============================================================ -->
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - KTX Management'">KTX Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<!-- Fragment: sidebar admin -->
+<div th:fragment="adminSidebar">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="brand">
+                <div class="icon">🏠</div>
+                <span>KTX Management</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Tổng quan</div>
+            <a class="nav-item" th:href="@{/admin/dashboard}">
+                <span class="nav-icon">📊</span> Dashboard
+            </a>
+
+            <div class="nav-section-label">Cơ sở vật chất</div>
+            <a class="nav-item" th:href="@{/admin/buildings}">
+                <span class="nav-icon">🏢</span> Tòa nhà
+            </a>
+            <a class="nav-item" th:href="@{/admin/rooms}">
+                <span class="nav-icon">🚪</span> Phòng ở
+            </a>
+
+            <div class="nav-section-label">Sinh viên</div>
+            <a class="nav-item" th:href="@{/admin/students}">
+                <span class="nav-icon">👤</span> Sinh viên
+            </a>
+            <a class="nav-item" th:href="@{/admin/registrations}">
+                <span class="nav-icon">📝</span> Đơn đăng ký
+            </a>
+            <a class="nav-item" th:href="@{/admin/contracts}">
+                <span class="nav-icon">📄</span> Hợp đồng
+            </a>
+
+            <div class="nav-section-label">Tài chính</div>
+            <a class="nav-item" th:href="@{/admin/invoices}">
+                <span class="nav-icon">💰</span> Hóa đơn
+            </a>
+            <a class="nav-item" th:href="@{/admin/violations}">
+                <span class="nav-icon">⚠️</span> Vi phạm
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar">A</div>
+                <div class="user-info">
+                    <div class="name" sec:authentication="name">Admin</div>
+                    <div class="role">Quản trị viên</div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn btn-ghost" style="width:100%; justify-content:center;" type="submit">
+                    🚪 Đăng xuất
+                </button>
+            </form>
+        </div>
+    </aside>
+</div>
+
+<!-- Fragment: sidebar student -->
+<div th:fragment="studentSidebar">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="brand">
+                <div class="icon">🏠</div>
+                <span>KTX Management</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Của tôi</div>
+            <a class="nav-item" th:href="@{/student/dashboard}">
+                <span class="nav-icon">🏠</span> Trang chủ
+            </a>
+            <a class="nav-item" th:href="@{/student/register}">
+                <span class="nav-icon">📝</span> Đăng ký phòng
+            </a>
+            <a class="nav-item" th:href="@{/student/contracts}">
+                <span class="nav-icon">📄</span> Hợp đồng
+            </a>
+            <a class="nav-item" th:href="@{/student/invoices}">
+                <span class="nav-icon">💰</span> Hóa đơn
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" style="background: linear-gradient(135deg, #2dd4a0, #4f8ef7);">S</div>
+                <div class="user-info">
+                    <div class="name" sec:authentication="name">Sinh viên</div>
+                    <div class="role">Sinh viên</div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn btn-ghost" style="width:100%; justify-content:center;" type="submit">
+                    🚪 Đăng xuất
+                </button>
+            </form>
+        </div>
+    </aside>
+</div>
+
+</html>

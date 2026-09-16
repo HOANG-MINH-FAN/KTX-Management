@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Thêm/Sửa Phòng')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title" th:text="${room.id != null} ? 'Chỉnh sửa phòng' : 'Thêm phòng mới'"></div>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/rooms}">← Quay lại</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+            <div class="card" style="max-width:640px;">
+                <div class="card-header"><span class="card-title">🚪 Thông tin phòng</span></div>
+                <div class="card-body">
+                    <form th:action="@{/admin/rooms/save}" method="post">
+                        <input type="hidden" name="id" th:value="${room.id}">
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Tòa nhà *</label>
+                                <select class="form-control" name="buildingId" required>
+                                    <option value="">-- Chọn tòa nhà --</option>
+                                    <option th:each="b : ${buildings}"
+                                            th:value="${b.id}"
+                                            th:selected="${room.building?.id == b.id}"
+                                            th:text="${b.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Số phòng *</label>
+                                <input class="form-control" type="text" name="roomNumber"
+                                       th:value="${room.roomNumber}" required placeholder="VD: 101">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Tầng *</label>
+                                <input class="form-control" type="number" name="floor"
+                                       th:value="${room.floor ?: 1}" required min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sức chứa (số giường) *</label>
+                                <input class="form-control" type="number" name="capacity"
+                                       th:value="${room.capacity ?: 4}" required min="1">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Loại phòng *</label>
+                                <select class="form-control" name="roomType" required>
+                                    <option th:each="rt : ${roomTypes}"
+                                            th:value="${rt.name()}"
+                                            th:selected="${room.roomType == rt}"
+                                            th:text="${rt.name() == 'MALE' ? 'Nam' : (rt.name() == 'FEMALE' ? 'Nữ' : 'Hỗn hợp')}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tiền phòng/tháng (đ) *</label>
+                                <input class="form-control" type="number" name="roomFeePerMonth"
+                                       th:value="${room.roomFeePerMonth ?: 800000}" required min="0" step="50000">
+                            </div>
+                        </div>
+
+                        <div th:if="${room.id != null}" class="form-group">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-control" name="status">
+                                <option th:each="st : ${statuses}"
+                                        th:value="${st.name()}"
+                                        th:selected="${room.status == st}"
+                                        th:text="${st.name() == 'AVAILABLE' ? 'Còn chỗ' : (st.name() == 'FULL' ? 'Đầy' : 'Bảo trì')}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div style="display:flex; gap:12px; margin-top:8px;">
+                            <button class="btn btn-primary" type="submit">💾 Lưu</button>
+                            <a class="btn btn-ghost" th:href="@{/admin/rooms}">Hủy</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

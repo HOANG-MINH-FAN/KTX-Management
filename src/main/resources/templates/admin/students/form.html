@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Thêm/Sửa Sinh viên')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title" th:text="${student.id != null} ? 'Chỉnh sửa sinh viên' : 'Thêm sinh viên mới'"></div>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/students}">← Quay lại</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+            <div class="card" style="max-width:700px;">
+                <div class="card-header"><span class="card-title">Thông tin sinh viên</span></div>
+                <div class="card-body">
+                    <form th:action="@{/admin/students/save}" method="post">
+                        <input type="hidden" name="id" th:value="${student.id}">
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Tên đăng nhập *</label>
+                                <input class="form-control" type="text" name="username"
+                                       th:value="${student.username}" required placeholder="VD: sv001">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mật khẩu <span th:if="${student.id != null}">(để trống nếu không đổi)</span></label>
+                                <input class="form-control" type="password" name="password"
+                                       th:required="${student.id == null}" placeholder="Nhập mật khẩu">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Mã sinh viên *</label>
+                                <input class="form-control" type="text" name="studentCode"
+                                       th:value="${student.studentCode}" required placeholder="VD: SV2024001">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Họ và tên *</label>
+                                <input class="form-control" type="text" name="fullName"
+                                       th:value="${student.fullName}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Điện thoại</label>
+                                <input class="form-control" type="tel" name="phone" th:value="${student.phone}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input class="form-control" type="email" name="email" th:value="${student.email}">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Khoa / Ngành</label>
+                                <input class="form-control" type="text" name="faculty" th:value="${student.faculty}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Giới tính</label>
+                                <select class="form-control" name="gender">
+                                    <option value="">-- Chọn --</option>
+                                    <option value="MALE"   th:selected="${student.gender == 'MALE'}">Nam</option>
+                                    <option value="FEMALE" th:selected="${student.gender == 'FEMALE'}">Nữ</option>
+                                    <option value="OTHER"  th:selected="${student.gender == 'OTHER'}">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Ngày sinh</label>
+                                <input class="form-control" type="date" name="dateOfBirth"
+                                       th:value="${student.dateOfBirth}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quê quán</label>
+                                <input class="form-control" type="text" name="hometown" th:value="${student.hometown}">
+                            </div>
+                        </div>
+
+                        <div style="display:flex; gap:12px; margin-top:8px;">
+                            <button class="btn btn-primary" type="submit">💾 Lưu</button>
+                            <a class="btn btn-ghost" th:href="@{/admin/students}">Hủy</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Tạo Hóa đơn')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">💰 Tạo Hóa đơn tháng</div>
+                <div class="topbar-subtitle">Áp dụng OOP: RoomFee + ElectricityFee + WaterFee + ServiceFee</div>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/invoices}">← Quay lại</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+            <div class="card" style="max-width:700px;">
+                <div class="card-header">
+                    <span class="card-title">📋 Thông tin hóa đơn</span>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/admin/invoices/create}" method="post">
+
+                        <!-- Hợp đồng -->
+                        <div class="form-group">
+                            <label class="form-label">Hợp đồng *</label>
+                            <select class="form-control" name="contractId" required>
+                                <option value="">-- Chọn hợp đồng --</option>
+                                <option th:each="c : ${contracts}"
+                                        th:value="${c.id}"
+                                        th:text="${c.student?.fullName} + ' — Phòng ' + ${c.room?.roomNumber} + ' (' + ${c.room?.building?.name} + ')'">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Kỳ hóa đơn -->
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Tháng *</label>
+                                <select class="form-control" name="month" required>
+                                    <option th:each="m : ${#numbers.sequence(1,12)}"
+                                            th:value="${m}" th:text="'Tháng ' + ${m}"></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Năm *</label>
+                                <input class="form-control" type="number" name="year"
+                                       th:value="${#dates.year(#dates.createNow())}" required min="2020" max="2030">
+                            </div>
+                        </div>
+
+                        <!-- Chỉ số điện -->
+                        <div class="card mb-4" style="background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.2);">
+                            <div class="card-header">
+                                <span>⚡ Chỉ số điện (ElectricityFee — OOP)</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Chỉ số cũ (kWh)</label>
+                                        <input class="form-control" type="number" name="prevElec" value="0" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Chỉ số mới (kWh)</label>
+                                        <input class="form-control" type="number" name="currElec" value="0" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Giá/kWh (đ)</label>
+                                        <input class="form-control" type="number" name="pricePerKwh" value="3500" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chỉ số nước -->
+                        <div class="card mb-4" style="background: rgba(79,142,247,0.05); border-color: rgba(79,142,247,0.2);">
+                            <div class="card-header">
+                                <span>💧 Chỉ số nước (WaterFee — OOP)</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Chỉ số cũ (m³)</label>
+                                        <input class="form-control" type="number" name="prevWater" value="0" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Chỉ số mới (m³)</label>
+                                        <input class="form-control" type="number" name="currWater" value="0" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Giá/m³ (đ)</label>
+                                        <input class="form-control" type="number" name="pricePerM3" value="10000" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phí dịch vụ -->
+                        <div class="form-group">
+                            <label class="form-label">Phí dịch vụ phát sinh (ServiceFee — OOP, để 0 nếu không có)</label>
+                            <input class="form-control" type="number" name="serviceFee" value="0" min="0">
+                        </div>
+
+                        <div style="background:rgba(45,212,160,0.08); border:1px solid rgba(45,212,160,0.2); border-radius:8px; padding:12px; margin-bottom:20px;">
+                            <div style="font-size:0.8rem; color:var(--accent-green); font-weight:600;">💡 OOP Polymorphism</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+                                Hệ thống sẽ tạo các đối tượng RoomFee, ElectricityFee, WaterFee, ServiceFee
+                                và gọi <code style="color:var(--accent-blue)">calculateFee()</code> đa hình trên mỗi đối tượng để tính tổng tiền.
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">💾 Tạo hóa đơn</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

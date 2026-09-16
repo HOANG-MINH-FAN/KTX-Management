@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Hóa đơn của tôi')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">💰 Hóa đơn của tôi</div>
+            </div>
+        </div>
+        <div class="page-content">
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Kỳ</th>
+                                <th>Tổng tiền</th>
+                                <th>Hạn TT</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="inv, i : ${invoices}">
+                                <td th:text="${i.count}"></td>
+                                <td th:text="'Tháng ' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></td>
+                                <td class="font-bold" style="color:var(--accent-orange);"
+                                    th:text="${#numbers.formatDecimal(inv.totalAmount,1,'COMMA',0,'POINT')} + ' đ'"></td>
+                                <td th:text="${inv.dueDate}"></td>
+                                <td>
+                                    <span th:if="${inv.status?.name() == 'UNPAID'}"  class="badge badge-warning">Chưa thanh toán</span>
+                                    <span th:if="${inv.status?.name() == 'PAID'}"    class="badge badge-success">Đã thanh toán</span>
+                                    <span th:if="${inv.status?.name() == 'OVERDUE'}" class="badge badge-danger">Quá hạn</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(invoices)}">
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <div class="icon">💰</div>
+                                        <h3>Chưa có hóa đơn nào</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Quản lý Sinh viên')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">👤 Quản lý Sinh viên</div>
+                <div class="topbar-subtitle" th:text="'Tổng cộng: ' + ${#lists.size(students)} + ' sinh viên'"></div>
+            </div>
+            <a class="btn btn-primary" th:href="@{/admin/students/new}">➕ Thêm sinh viên</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Mã SV</th>
+                                <th>Họ và tên</th>
+                                <th>Tài khoản</th>
+                                <th>Khoa</th>
+                                <th>Điện thoại</th>
+                                <th>Giới tính</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="s, iter : ${students}">
+                                <td class="text-muted" th:text="${iter.count}"></td>
+                                <td><span class="badge badge-info" th:text="${s.studentCode}"></span></td>
+                                <td class="font-bold" th:text="${s.fullName}"></td>
+                                <td class="text-muted" th:text="${s.username}"></td>
+                                <td th:text="${s.faculty ?: '—'}"></td>
+                                <td th:text="${s.phone ?: '—'}"></td>
+                                <td>
+                                    <span th:if="${s.gender == 'MALE'}"   class="badge badge-info">Nam</span>
+                                    <span th:if="${s.gender == 'FEMALE'}" class="badge badge-purple">Nữ</span>
+                                    <span th:if="${s.gender == null}"     class="text-muted">—</span>
+                                </td>
+                                <td>
+                                    <div style="display:flex; gap:6px;">
+                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/students/edit/{id}(id=${s.id})}">✏️</a>
+                                        <form th:action="@{/admin/students/delete/{id}(id=${s.id})}" method="post"
+                                              onsubmit="return confirm('Xóa sinh viên này?')">
+                                            <button class="btn btn-sm btn-danger" type="submit">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(students)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="icon">👤</div>
+                                        <h3>Chưa có sinh viên nào</h3>
+                                        <p>Thêm sinh viên mới để bắt đầu.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Hợp đồng của tôi')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div><div class="topbar-title">📄 Hợp đồng của tôi</div></div>
+        </div>
+        <div class="page-content">
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Phòng</th><th>Bắt đầu</th><th>Kết thúc</th><th>Tiền/tháng</th><th>Trạng thái</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c, i : ${contracts}">
+                                <td th:text="${i.count}"></td>
+                                <td th:text="${c.room?.building?.name + ' - ' + c.room?.roomNumber}"></td>
+                                <td th:text="${c.startDate}"></td>
+                                <td th:text="${c.endDate}"></td>
+                                <td th:text="${#numbers.formatDecimal(c.monthlyFee,1,'COMMA',0,'POINT')} + ' đ'"></td>
+                                <td>
+                                    <span th:if="${c.status?.name() == 'ACTIVE'}"      class="badge badge-success">Đang hiệu lực</span>
+                                    <span th:if="${c.status?.name() == 'EXPIRED'}"     class="badge badge-secondary">Hết hạn</span>
+                                    <span th:if="${c.status?.name() == 'TERMINATED'}"  class="badge badge-danger">Đã kết thúc</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(contracts)}">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="icon">📄</div>
+                                        <h3>Chưa có hợp đồng nào</h3>
+                                        <a class="btn btn-primary" style="margin-top:12px;" th:href="@{/student/register}">📝 Đăng ký phòng</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

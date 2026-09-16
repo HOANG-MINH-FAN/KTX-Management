@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Quản lý Tòa nhà')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div><div class="topbar-title">🏢 Quản lý Tòa nhà</div></div>
+            <a class="btn btn-primary" th:href="@{/admin/buildings/new}">➕ Thêm tòa nhà</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Tên tòa nhà</th><th>Địa chỉ</th><th>Số tầng</th><th>Số phòng</th><th>Thao tác</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b, i : ${buildings}">
+                                <td th:text="${i.count}"></td>
+                                <td class="font-bold" th:text="${b.name}"></td>
+                                <td class="text-muted" th:text="${b.address ?: '—'}"></td>
+                                <td th:text="${b.totalFloors}"></td>
+                                <td><span class="badge badge-info" th:text="${b.totalRooms}"></span></td>
+                                <td>
+                                    <div style="display:flex; gap:6px;">
+                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/buildings/edit/{id}(id=${b.id})}">✏️</a>
+                                        <form th:action="@{/admin/buildings/delete/{id}(id=${b.id})}" method="post"
+                                              onsubmit="return confirm('Xóa tòa nhà này?')">
+                                            <button class="btn btn-sm btn-danger" type="submit">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(buildings)}">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="icon">🏢</div>
+                                        <h3>Chưa có tòa nhà nào</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

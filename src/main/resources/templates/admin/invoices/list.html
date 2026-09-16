@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Quản lý Hóa đơn')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">💰 Quản lý Hóa đơn</div>
+            </div>
+            <a class="btn btn-primary" th:href="@{/admin/invoices/create}">➕ Tạo hóa đơn</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Sinh viên</th>
+                                <th>Phòng</th>
+                                <th>Kỳ</th>
+                                <th>Tổng tiền</th>
+                                <th>Hạn TT</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="inv, i : ${invoices}">
+                                <td th:text="${i.count}"></td>
+                                <td th:text="${inv.contract?.student?.fullName}"></td>
+                                <td th:text="${inv.contract?.room?.building?.name} + ' - ' + ${inv.contract?.room?.roomNumber}"></td>
+                                <td th:text="'T' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></td>
+                                <td class="font-bold" style="color:var(--accent-orange);"
+                                    th:text="${#numbers.formatDecimal(inv.totalAmount,1,'COMMA',0,'POINT')} + ' đ'"></td>
+                                <td th:text="${inv.dueDate}"></td>
+                                <td>
+                                    <span th:if="${inv.status?.name() == 'UNPAID'}"  class="badge badge-warning">Chưa trả</span>
+                                    <span th:if="${inv.status?.name() == 'PAID'}"    class="badge badge-success">Đã trả</span>
+                                    <span th:if="${inv.status?.name() == 'OVERDUE'}" class="badge badge-danger">Quá hạn</span>
+                                </td>
+                                <td>
+                                    <form th:unless="${inv.isPaid()}"
+                                          th:action="@{/admin/invoices/pay/{id}(id=${inv.id})}" method="post"
+                                          style="display:inline-flex; gap:6px; align-items:center;">
+                                        <input class="form-control" style="width:120px; padding:5px 8px; font-size:0.78rem;"
+                                               type="number" name="amountPaid"
+                                               th:value="${inv.totalAmount}" min="0" step="1000">
+                                        <button class="btn btn-sm btn-success" type="submit">✅ Ghi TT</button>
+                                    </form>
+                                    <span th:if="${inv.isPaid()}" class="text-muted text-sm">✓ Hoàn tất</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(invoices)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="icon">💰</div>
+                                        <h3>Không có hóa đơn nào chưa thanh toán</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

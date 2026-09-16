@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Quản lý Vi phạm')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">⚠️ Quản lý Vi phạm nội quy</div>
+            </div>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <!-- Form thêm vi phạm -->
+            <div class="card mb-6">
+                <div class="card-header"><span class="card-title">➕ Ghi nhận vi phạm mới</span></div>
+                <div class="card-body">
+                    <form th:action="@{/admin/violations/save}" method="post">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Sinh viên *</label>
+                                <select class="form-control" name="studentId" required>
+                                    <option value="">-- Chọn sinh viên --</option>
+                                    <option th:each="s : ${students}"
+                                            th:value="${s.id}"
+                                            th:text="${s.fullName} + ' (' + ${s.studentCode} + ')'">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ngày vi phạm *</label>
+                                <input class="form-control" type="date" name="violationDate"
+                                       th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mức phạt (đ, để 0 nếu chỉ cảnh cáo)</label>
+                                <input class="form-control" type="number" name="fineAmount" value="0" min="0" step="50000">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mô tả vi phạm *</label>
+                            <textarea class="form-control" name="description" rows="2" required
+                                      placeholder="VD: Gây ồn ào sau 22h, mang thức ăn vào phòng..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ghi chú</label>
+                            <input class="form-control" type="text" name="note" placeholder="Ghi chú thêm (nếu có)">
+                        </div>
+                        <button class="btn btn-danger" type="submit">⚠️ Ghi nhận vi phạm</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Danh sách vi phạm -->
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Sinh viên</th>
+                                <th>Mô tả</th>
+                                <th>Ngày VP</th>
+                                <th>Mức phạt</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="v, i : ${violations}">
+                                <td th:text="${i.count}"></td>
+                                <td>
+                                    <div class="font-bold" th:text="${v.student?.fullName}"></div>
+                                    <div class="text-muted text-sm" th:text="${v.student?.studentCode}"></div>
+                                </td>
+                                <td class="text-sm" th:text="${v.description}"></td>
+                                <td th:text="${v.violationDate}"></td>
+                                <td th:if="${v.fineAmount?.compareTo(new java.math.BigDecimal('0')) > 0}"
+                                    class="font-bold" style="color:var(--accent-red);"
+                                    th:text="${#numbers.formatDecimal(v.fineAmount,1,'COMMA',0,'POINT')} + ' đ'"></td>
+                                <td th:unless="${v.fineAmount?.compareTo(new java.math.BigDecimal('0')) > 0}"
+                                    class="text-muted">Chỉ cảnh cáo</td>
+                                <td>
+                                    <span th:if="${v.status?.name() == 'UNPAID'}"  class="badge badge-warning">Chưa nộp</span>
+                                    <span th:if="${v.status?.name() == 'PAID'}"    class="badge badge-success">Đã nộp</span>
+                                    <span th:if="${v.status?.name() == 'WAIVED'}"  class="badge badge-secondary">Đã miễn</span>
+                                </td>
+                                <td>
+                                    <div th:if="${v.status?.name() == 'UNPAID'}" style="display:flex; gap:6px;">
+                                        <form th:action="@{/admin/violations/paid/{id}(id=${v.id})}" method="post">
+                                            <button class="btn btn-sm btn-success" type="submit">✅ Đã nộp</button>
+                                        </form>
+                                        <form th:action="@{/admin/violations/waive/{id}(id=${v.id})}" method="post">
+                                            <input type="hidden" name="note" value="Được miễn giảm">
+                                            <button class="btn btn-sm btn-ghost" type="submit">🔓 Miễn</button>
+                                        </form>
+                                        <form th:action="@{/admin/violations/delete/{id}(id=${v.id})}" method="post"
+                                              onsubmit="return confirm('Xóa vi phạm này?')">
+                                            <button class="btn btn-sm btn-danger" type="submit">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(violations)}">
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <div class="icon">✅</div>
+                                        <h3>Chưa có vi phạm nào</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

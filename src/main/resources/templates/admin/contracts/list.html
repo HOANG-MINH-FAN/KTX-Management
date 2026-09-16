@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Quản lý Hợp đồng')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div><div class="topbar-title">📄 Quản lý Hợp đồng</div></div>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Sinh viên</th><th>Phòng</th><th>Bắt đầu</th><th>Kết thúc</th><th>Tiền/tháng</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c, i : ${contracts}">
+                                <td th:text="${i.count}"></td>
+                                <td>
+                                    <div class="font-bold" th:text="${c.student?.fullName}"></div>
+                                    <div class="text-muted text-sm" th:text="${c.student?.studentCode}"></div>
+                                </td>
+                                <td th:text="${c.room?.building?.name + ' - ' + c.room?.roomNumber}"></td>
+                                <td th:text="${c.startDate}"></td>
+                                <td th:text="${c.endDate}"></td>
+                                <td th:text="${#numbers.formatDecimal(c.monthlyFee,1,'COMMA',0,'POINT')} + ' đ'"></td>
+                                <td>
+                                    <span th:if="${c.status?.name() == 'ACTIVE'}"      class="badge badge-success">Đang hiệu lực</span>
+                                    <span th:if="${c.status?.name() == 'EXPIRED'}"     class="badge badge-secondary">Hết hạn</span>
+                                    <span th:if="${c.status?.name() == 'TERMINATED'}"  class="badge badge-danger">Đã kết thúc</span>
+                                </td>
+                                <td>
+                                    <form th:if="${c.status?.name() == 'ACTIVE'}"
+                                          th:action="@{/admin/contracts/terminate/{id}(id=${c.id})}" method="post"
+                                          onsubmit="return confirm('Kết thúc sớm hợp đồng này?')">
+                                        <button class="btn btn-sm btn-danger" type="submit">🔚 Kết thúc</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(contracts)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="icon">📄</div>
+                                        <h3>Chưa có hợp đồng nào</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

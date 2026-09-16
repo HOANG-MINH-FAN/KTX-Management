@@ -2,8 +2,17 @@ package com.dormitory.repository;
 
 import com.dormitory.entity.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AdminRepository extends JpaRepository<Admin, Integer> {
-    Admin findByUsername(String username);
+import java.util.Optional;
+
+/**
+ * Repository cho Admin entity.
+ */
+@Repository
+public interface AdminRepository extends JpaRepository<Admin, Long> {
+
+    Optional<Admin> findByUsername(String username);
+
+    boolean existsByUsername(String username);
 }
-

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Dashboard Sinh viên')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">🏠 Dashboard Sinh viên</div>
+                <div class="topbar-subtitle" th:text="'Xin chào, ' + ${student?.fullName}"></div>
+            </div>
+        </div>
+        <div class="page-content">
+
+            <!-- Alerts -->
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-warning" th:if="${warning}" th:text="${warning}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <!-- Thông tin cá nhân -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                <div class="stat-card blue">
+                    <div class="stat-icon">🎓</div>
+                    <div class="stat-value" style="font-size:1.1rem;" th:text="${student?.studentCode}">—</div>
+                    <div class="stat-label">Mã sinh viên</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon">🏠</div>
+                    <div class="stat-value" style="font-size:1rem;"
+                         th:text="${activeContract != null} ? ${activeContract.room?.building?.name} + ' - ' + ${activeContract.room?.roomNumber} : 'Chưa có'">—</div>
+                    <div class="stat-label">Phòng hiện tại</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" style="font-size:1.3rem;"
+                         th:text="${#lists.size(recentInvoices)}">0</div>
+                    <div class="stat-label">Hóa đơn</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-value" style="font-size:1.3rem;"
+                         th:text="${#lists.size(violations)}">0</div>
+                    <div class="stat-label">Vi phạm</div>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <!-- Hợp đồng -->
+                <div class="card">
+                    <div class="card-header"><span class="card-title">📄 Hợp đồng hiện tại</span></div>
+                    <div class="card-body">
+                        <div th:if="${activeContract != null}">
+                            <div class="flex-between mb-4">
+                                <span class="text-muted text-sm">Phòng</span>
+                                <span class="font-bold" th:text="${activeContract.room?.building?.name + ' - ' + activeContract.room?.roomNumber}"></span>
+                            </div>
+                            <div class="flex-between mb-4">
+                                <span class="text-muted text-sm">Bắt đầu</span>
+                                <span th:text="${activeContract.startDate}"></span>
+                            </div>
+                            <div class="flex-between mb-4">
+                                <span class="text-muted text-sm">Kết thúc</span>
+                                <span th:text="${activeContract.endDate}"></span>
+                            </div>
+                            <div class="flex-between">
+                                <span class="text-muted text-sm">Tiền phòng/tháng</span>
+                                <span class="font-bold" style="color:var(--accent-orange);"
+                                      th:text="${#numbers.formatDecimal(activeContract.monthlyFee,1,'COMMA',0,'POINT')} + ' đ'"></span>
+                            </div>
+                        </div>
+                        <div th:unless="${activeContract != null}" class="empty-state" style="padding:30px;">
+                            <div class="icon">📄</div>
+                            <h3>Chưa có hợp đồng</h3>
+                            <a class="btn btn-primary" style="margin-top:12px;" th:href="@{/student/register}">
+                                📝 Đăng ký phòng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hóa đơn gần đây -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">💰 Hóa đơn gần đây</span>
+                        <a class="btn btn-sm btn-ghost" th:href="@{/student/invoices}">Xem tất cả</a>
+                    </div>
+                    <div class="card-body" style="padding:0;">
+                        <div th:each="inv : ${recentInvoices}" style="padding:12px 20px; border-bottom:1px solid var(--border);">
+                            <div class="flex-between">
+                                <span th:text="'T' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></span>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span th:text="${#numbers.formatDecimal(inv.totalAmount,1,'COMMA',0,'POINT')} + ' đ'"
+                                          style="font-weight:600; color:var(--accent-orange);"></span>
+                                    <span th:if="${inv.status?.name() == 'UNPAID'}"  class="badge badge-warning">Chưa trả</span>
+                                    <span th:if="${inv.status?.name() == 'PAID'}"    class="badge badge-success">Đã trả</span>
+                                    <span th:if="${inv.status?.name() == 'OVERDUE'}" class="badge badge-danger">Quá hạn</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${#lists.isEmpty(recentInvoices)}" class="empty-state" style="padding:30px;">
+                            <p>Chưa có hóa đơn nào</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

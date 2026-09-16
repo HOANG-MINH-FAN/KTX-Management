@@ -2,25 +2,39 @@ package com.dormitory.entity;
 
 import jakarta.persistence.*;
 
+/**
+ * ============================================================
+ * ENTITY: Admin
+ * ============================================================
+ * Kế thừa từ lớp trừu tượng User (Inheritance).
+ *
+ * Admin là quản trị viên hệ thống:
+ * - Có toàn quyền CRUD: sinh viên, phòng, tòa nhà
+ * - Duyệt/từ chối đơn đăng ký
+ * - Tạo và quản lý hóa đơn
+ * - Ghi nhận vi phạm
+ *
+ * Lưu ý: Admin không có thêm trường dữ liệu riêng,
+ * chỉ được phân biệt bằng discriminator role='ADMIN'.
+ * ============================================================
+ */
 @Entity
-@Table(name = "admins")
+@DiscriminatorValue("ADMIN")
+public class Admin extends User {
 
-public class Admin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    // Admin không có thêm trường riêng ngoài User.
+    // Có thể mở rộng sau: thêm trường department, phone...
 
-    private String username;
-    private String password;
+    public Admin() {
+        super();
+    }
 
-    public Admin() {}
+    public Admin(String username, String password) {
+        super(username, password);
+    }
 
-    public Integer getId() { return id; }
-
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    @Override
+    public String toString() {
+        return "Admin{id=" + getId() + ", username='" + getUsername() + "'}";
+    }
 }
-

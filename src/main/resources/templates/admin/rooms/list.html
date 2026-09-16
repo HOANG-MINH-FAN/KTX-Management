@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Quản lý Phòng ở')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">🚪 Quản lý Phòng ở</div>
+                <div class="topbar-subtitle" th:text="'Tổng cộng: ' + ${#lists.size(rooms)} + ' phòng'"></div>
+            </div>
+            <a class="btn btn-primary" th:href="@{/admin/rooms/new}">➕ Thêm phòng</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tòa nhà</th>
+                                <th>Phòng</th>
+                                <th>Tầng</th>
+                                <th>Loại</th>
+                                <th>Sức chứa</th>
+                                <th>Đang ở</th>
+                                <th>Trống</th>
+                                <th>Phí/tháng</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r, iter : ${rooms}">
+                                <td class="text-muted" th:text="${iter.count}"></td>
+                                <td class="font-bold" th:text="${r.building?.name ?: '—'}"></td>
+                                <td><span class="badge badge-info" th:text="${r.roomNumber}"></span></td>
+                                <td th:text="${r.floor}"></td>
+                                <td>
+                                    <span th:if="${r.roomType?.name() == 'MALE'}"   class="badge badge-info">Nam</span>
+                                    <span th:if="${r.roomType?.name() == 'FEMALE'}" class="badge badge-purple">Nữ</span>
+                                    <span th:if="${r.roomType?.name() == 'MIXED'}"  class="badge badge-secondary">Hỗn hợp</span>
+                                </td>
+                                <td th:text="${r.capacity}"></td>
+                                <td th:text="${r.occupied}"></td>
+                                <td th:text="${r.availableSlots}" style="color: var(--accent-green); font-weight:600;"></td>
+                                <td th:text="${#numbers.formatDecimal(r.roomFeePerMonth, 1, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td>
+                                    <span th:if="${r.status?.name() == 'AVAILABLE'}"   class="badge badge-success">Còn chỗ</span>
+                                    <span th:if="${r.status?.name() == 'FULL'}"         class="badge badge-danger">Đầy</span>
+                                    <span th:if="${r.status?.name() == 'MAINTENANCE'}"  class="badge badge-warning">Bảo trì</span>
+                                </td>
+                                <td>
+                                    <div style="display:flex; gap:6px;">
+                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/rooms/edit/{id}(id=${r.id})}">✏️</a>
+                                        <form th:action="@{/admin/rooms/delete/{id}(id=${r.id})}" method="post"
+                                              onsubmit="return confirm('Xóa phòng này?')">
+                                            <button class="btn btn-sm btn-danger" type="submit">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(rooms)}">
+                                <td colspan="11">
+                                    <div class="empty-state">
+                                        <div class="icon">🚪</div>
+                                        <h3>Chưa có phòng nào</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

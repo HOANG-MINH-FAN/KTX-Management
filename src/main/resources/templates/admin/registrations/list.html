@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Quản lý Đơn đăng ký')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">📝 Đơn đăng ký phòng</div>
+                <div class="topbar-subtitle" th:text="${pendingCount} + ' đơn đang chờ duyệt'"></div>
+            </div>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Sinh viên</th>
+                                <th>Phòng yêu cầu</th>
+                                <th>Ngày vào ở</th>
+                                <th>Ghi chú SV</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày gửi</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r, i : ${registrations}">
+                                <td th:text="${i.count}"></td>
+                                <td>
+                                    <div class="font-bold" th:text="${r.student?.fullName}"></div>
+                                    <div class="text-muted text-sm" th:text="${r.student?.studentCode}"></div>
+                                </td>
+                                <td>
+                                    <div class="font-bold" th:text="${r.room?.building?.name}"></div>
+                                    <div class="text-muted text-sm" th:text="'Phòng ' + ${r.room?.roomNumber}"></div>
+                                </td>
+                                <td th:text="${r.desiredStartDate}"></td>
+                                <td class="text-muted text-sm" th:text="${r.note ?: '—'}"></td>
+                                <td>
+                                    <span th:if="${r.status?.name() == 'PENDING'}"   class="badge badge-warning">Chờ duyệt</span>
+                                    <span th:if="${r.status?.name() == 'APPROVED'}"  class="badge badge-success">Đã duyệt</span>
+                                    <span th:if="${r.status?.name() == 'REJECTED'}"  class="badge badge-danger">Từ chối</span>
+                                </td>
+                                <td class="text-muted text-sm" th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <div th:if="${r.status?.name() == 'PENDING'}" style="display:flex; gap:6px;">
+                                        <!-- Duyệt -->
+                                        <form th:action="@{/admin/registrations/approve/{id}(id=${r.id})}" method="post">
+                                            <input type="hidden" name="adminNote" value="Đã duyệt">
+                                            <button class="btn btn-sm btn-success" type="submit"
+                                                    onclick="return confirm('Duyệt đơn này và tạo hợp đồng?')">
+                                                ✅ Duyệt
+                                            </button>
+                                        </form>
+                                        <!-- Từ chối -->
+                                        <form th:action="@{/admin/registrations/reject/{id}(id=${r.id})}" method="post">
+                                            <input type="hidden" name="adminNote" value="Không đáp ứng điều kiện">
+                                            <button class="btn btn-sm btn-danger" type="submit">❌ Từ chối</button>
+                                        </form>
+                                    </div>
+                                    <span th:unless="${r.status?.name() == 'PENDING'}"
+                                          class="text-muted text-sm"
+                                          th:text="${r.adminNote ?: '—'}"></span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(registrations)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="icon">📝</div>
+                                        <h3>Chưa có đơn đăng ký nào</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/sidebar :: head('Dashboard Admin')}"></head>
+<body>
+<div class="layout">
+    <!-- Sidebar -->
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">📊 Dashboard</div>
+                <div class="topbar-subtitle">Tổng quan hệ thống ký túc xá</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <!-- Alerts -->
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <!-- Stat Cards -->
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-icon" style="background:rgba(79,142,247,0.12)">🚪</div>
+                    <div class="stat-value" th:text="${totalRooms}">0</div>
+                    <div class="stat-label">Tổng số phòng</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon" style="background:rgba(45,212,160,0.12)">👥</div>
+                    <div class="stat-value" th:text="${totalStudentsInDorm}">0</div>
+                    <div class="stat-label">Sinh viên đang ở</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-icon" style="background:rgba(124,92,191,0.12)">📊</div>
+                    <div class="stat-value" th:text="${emptyPlaces}">0</div>
+                    <div class="stat-label">Chỗ trống còn lại</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-icon" style="background:rgba(249,115,22,0.12)">📝</div>
+                    <div class="stat-value" th:text="${pendingRegistrations}">0</div>
+                    <div class="stat-label">Đơn chờ duyệt</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-icon" style="background:rgba(245,158,11,0.12)">💰</div>
+                    <div class="stat-value" th:text="${unpaidInvoices}">0</div>
+                    <div class="stat-label">Hóa đơn chưa trả</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-icon" style="background:rgba(239,68,68,0.12)">⚠️</div>
+                    <div class="stat-value" th:text="${unpaidViolations}">0</div>
+                    <div class="stat-label">Vi phạm chưa xử lý</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mb-6">
+                <div class="card-header">
+                    <span class="card-title">⚡ Thao tác nhanh</span>
+                </div>
+                <div class="card-body">
+                    <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                        <a class="btn btn-primary" th:href="@{/admin/registrations}">📝 Duyệt đơn đăng ký</a>
+                        <a class="btn btn-primary" th:href="@{/admin/invoices/create}">💰 Tạo hóa đơn</a>
+                        <a class="btn btn-ghost"   th:href="@{/admin/students/new}">➕ Thêm sinh viên</a>
+                        <a class="btn btn-ghost"   th:href="@{/admin/rooms/new}">➕ Thêm phòng</a>
+                        <a class="btn btn-ghost"   th:href="@{/admin/violations}">⚠️ Xem vi phạm</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
