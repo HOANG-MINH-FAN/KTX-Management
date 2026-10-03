@@ -1,7 +1,7 @@
 -- =============================================================
 -- HỆ THỐNG QUẢN LÝ KÝ TÚC XÁ SINH VIÊN
 -- dormitory_db.sql  –  DDL + Seed Data hoàn chỉnh
--- Phiên bản: 2.0 (nâng cấp từ schema cơ bản)
+-- Phiên bản: 3.0 (chốt schema cho chức năng 1-11)
 --
 -- Cách chạy:
 --   mysql -u root -p < dormitory_db.sql
@@ -26,6 +26,10 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- =============================================================
 -- XÓA BẢNG CŨ (thứ tự từ phụ thuộc -> độc lập)
 -- =============================================================
+DROP TABLE IF EXISTS exchange_reviews;
+DROP TABLE IF EXISTS exchange_requests;
+DROP TABLE IF EXISTS exchange_items;
+DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS invoice_details;
 DROP TABLE IF EXISTS invoices;
@@ -117,6 +121,32 @@ CREATE TABLE rooms (
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Bảng phòng ở';
+  
+  -- =============================================================
+-- BẢNG 4: allocations
+-- Phân bổ sinh viên vào phòng.
+-- =============================================================
+CREATE TABLE allocations (
+    id              INT             NOT NULL AUTO_INCREMENT,
+    student_id      BIGINT          NULL,
+    room_id         BIGINT          NULL,
+    check_in_date   DATE            NULL,
+    status          VARCHAR(255)    NULL,
+
+    PRIMARY KEY (id),
+
+    INDEX idx_allocation_student (student_id),
+    INDEX idx_allocation_room (room_id),
+
+    CONSTRAINT fk_allocation_student
+        FOREIGN KEY (student_id) REFERENCES users(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+
+    CONSTRAINT fk_allocation_room
+        FOREIGN KEY (room_id) REFERENCES rooms(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Phân bổ sinh viên vào phòng';
 
 -- =============================================================
 -- BẢNG 4: registrations
@@ -267,6 +297,133 @@ CREATE TABLE violations (
   COMMENT='Bảng vi phạm nội quy';
 
 -- =============================================================
+-- BẢNG 10: notifications
+-- Cảnh báo nghiệp vụ: hợp đồng sắp hết hạn, hóa đơn quá hạn,
+-- đơn chờ duyệt, phòng sắp đầy, vi phạm chưa xử lý...
+-- =============================================================
+CREATE TABLE notifications (
+    id              BIGINT          NOT NULL AUTO_INCREMENT,
+    user_id         BIGINT          NOT NULL,
+    type            VARCHAR(50)     NOT NULL,
+    title           VARCHAR(255)    NOT NULL,
+    message         TEXT            NOT NULL,
+    is_read         BOOLEAN         NOT NULL DEFAULT FALSE,
+    related_type    VARCHAR(50)     NULL,
+    related_id      BIGINT          NULL,
+    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    INDEX idx_notification_user (user_id),
+    INDEX idx_notification_read (user_id, is_read),
+    INDEX idx_notification_created (created_at),
+
+    CONSTRAINT fk_notification_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Thông báo/cảnh báo nghiệp vụ';
+
+-- =============================================================
+-- BẢNG 11: exchange_items
+-- Tin đăng trao đổi đồ: bán, trao đổi hoặc cho tặng.
+-- =============================================================
+CREATE TABLE exchange_items (
+    id              BIGINT          NOT NULL AUTO_INCREMENT,
+    owner_id        BIGINT          NOT NULL,
+    title           VARCHAR(255)    NOT NULL,
+    description     TEXT            NULL,
+    category        VARCHAR(50)     NOT NULL,
+    exchange_type   VARCHAR(20)     NOT NULL COMMENT 'SELL | EXCHANGE | GIVEAWAY',
+    item_condition  VARCHAR(20)     NOT NULL COMMENT 'NEW | LIKE_NEW | USED',
+    price           DECIMAL(15,2)   NULL,
+    desired_item    VARCHAR(500)    NULL,
+    image_path      VARCHAR(500)    NULL,
+    status          VARCHAR(20)     NOT NULL DEFAULT 'AVAILABLE'
+                                    COMMENT 'AVAILABLE | PENDING | SOLD | EXCHANGED | CLOSED',
+    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+                                    ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    INDEX idx_exchange_owner (owner_id),
+    INDEX idx_exchange_category (category),
+    INDEX idx_exchange_type (exchange_type),
+    INDEX idx_exchange_status (status),
+    INDEX idx_exchange_created (created_at),
+
+    CONSTRAINT fk_exchange_item_owner
+        FOREIGN KEY (owner_id) REFERENCES users(id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Tin đăng trao đổi đồ';
+
+-- =============================================================
+-- BẢNG 12: exchange_requests
+-- Yêu cầu mua/trao đổi/nhận đồ từ một tin đăng.
+-- =============================================================
+CREATE TABLE exchange_requests (
+    id              BIGINT          NOT NULL AUTO_INCREMENT,
+    item_id         BIGINT          NOT NULL,
+    requester_id    BIGINT          NOT NULL,
+    message         TEXT            NULL,
+    status          VARCHAR(20)     NOT NULL DEFAULT 'PENDING'
+                                    COMMENT 'PENDING | ACCEPTED | REJECTED | CANCELLED | COMPLETED',
+    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+                                    ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_exchange_request_item_user (item_id, requester_id),
+    INDEX idx_exchange_request_item (item_id),
+    INDEX idx_exchange_request_user (requester_id),
+    INDEX idx_exchange_request_status (status),
+
+    CONSTRAINT fk_exchange_request_item
+        FOREIGN KEY (item_id) REFERENCES exchange_items(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT fk_exchange_request_user
+        FOREIGN KEY (requester_id) REFERENCES users(id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Yêu cầu giao dịch trao đổi đồ';
+
+-- =============================================================
+-- BẢNG 13: exchange_reviews
+-- Đánh giá sau khi giao dịch hoàn tất.
+-- =============================================================
+CREATE TABLE exchange_reviews (
+    id              BIGINT          NOT NULL AUTO_INCREMENT,
+    request_id      BIGINT          NOT NULL,
+    reviewer_id     BIGINT          NOT NULL,
+    reviewee_id     BIGINT          NOT NULL,
+    rating          TINYINT         NOT NULL,
+    comment         TEXT            NULL,
+    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_exchange_review_request_reviewer (request_id, reviewer_id),
+    INDEX idx_exchange_review_reviewer (reviewer_id),
+    INDEX idx_exchange_review_reviewee (reviewee_id),
+
+    CONSTRAINT fk_exchange_review_request
+        FOREIGN KEY (request_id) REFERENCES exchange_requests(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT fk_exchange_review_reviewer
+        FOREIGN KEY (reviewer_id) REFERENCES users(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT fk_exchange_review_reviewee
+        FOREIGN KEY (reviewee_id) REFERENCES users(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT chk_exchange_review_rating
+        CHECK (rating BETWEEN 1 AND 5)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Đánh giá giao dịch trao đổi đồ';
+
+-- =============================================================
 -- DỮ LIỆU MẪU (SEED DATA)
 -- Lưu ý: Mật khẩu sẽ được DataInitializer.java mã hóa BCrypt
 --        khi khởi động lần đầu nếu bảng users còn trống.
@@ -297,6 +454,11 @@ INSERT INTO rooms (building_id, room_number, floor, capacity, occupied, room_typ
 (3, '201', 2, 2, 0, 'MIXED', 1500000, 'AVAILABLE'),
 (3, '202', 2, 2, 0, 'MIXED', 1500000, 'MAINTENANCE');
 
+-- =============================================================
+-- CHỐT SCHEMA:
+-- 14 bảng đã bao phủ chức năng 1-11.
+-- Từ thời điểm này, không tự ý thay đổi cấu trúc database.
+-- Nếu phát sinh nhu cầu mới, cả nhóm phải thống nhất trước.
 -- =============================================================
 -- Ghi chú: Tài khoản người dùng (users) và dữ liệu nghiệp vụ
 -- mẫu (hợp đồng, hóa đơn, vi phạm) sẽ được tạo tự động bởi

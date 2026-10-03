@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng tin</title>
+</head>
+<body>
+
+<h1>Đăng tin trao đổi</h1>
+
+<form th:action="@{/exchange/save}" th:object="${item}" method="post">
+
+    <p>
+        Tên đồ:
+        <input type="text" th:field="*{title}" required>
+    </p>
+
+    <p>
+        Mô tả:
+        <textarea th:field="*{description}"></textarea>
+    </p>
+
+    <p>
+        Danh mục:
+        <input type="text" th:field="*{category}" required>
+    </p>
+
+    <p>
+        Loại:
+        <select th:field="*{exchangeType}">
+            <option value="SELL">Bán</option>
+            <option value="EXCHANGE">Trao đổi</option>
+            <option value="GIVEAWAY">Cho</option>
+        </select>
+    </p>
+
+    <p>
+        Tình trạng:
+        <select th:field="*{itemCondition}">
+            <option value="NEW">Mới</option>
+            <option value="LIKE_NEW">Như mới</option>
+            <option value="USED">Đã sử dụng</option>
+        </select>
+    </p>
+
+    <p>
+        Giá:
+        <input type="number" th:field="*{price}">
+    </p>
+
+    <p>
+        Muốn đổi lấy:
+        <input type="text" th:field="*{desiredItem}">
+    </p>
+
+    <button type="submit">Đăng tin</button>
+
+</form>
+
+<a href="/exchange">Quay lại</a>
+
+</body>
+</html>

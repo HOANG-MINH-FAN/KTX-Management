@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trao đổi đồ</title>
+</head>
+<body>
+
+<h1>Trao đổi đồ</h1>
+
+<a href="/exchange/new">Đăng tin mới</a>
+
+<hr>
+
+<div th:if="${items.isEmpty()}">
+    <p>Chưa có sản phẩm nào.</p>
+</div>
+
+<div th:each="item : ${items}">
+    <h3 th:text="${item.title}"></h3>
+
+    <p>
+        Loại:
+        <span th:text="${item.exchangeType}"></span>
+    </p>
+
+    <p>
+        Tình trạng:
+        <span th:text="${item.itemCondition}"></span>
+    </p>
+
+    <a th:href="@{/exchange/{id}(id=${item.id})}">
+        Xem chi tiết
+    </a>
+
+    <hr>
+</div>
+
+</body>
+</html>
