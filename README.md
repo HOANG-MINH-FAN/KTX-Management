@@ -116,7 +116,7 @@ git push origin main
 ---
 
 ## 7. Lưu ý
-
+- ⚠️ Không tự ý sửa file `dormitory_db.sql`. Nếu cần thay đổi Database, phải thống nhất với cả nhóm trước.
 - Không code khi chưa `git pull`.
 - Không tự ý xóa hoặc sửa code của thành viên khác.
 - Code xong phải chạy thử trước khi `git push`.
