@@ -76,7 +76,7 @@ Mở Terminal trong thư mục project và chạy:
 Nếu chạy thành công, mở trình duyệt:
 
 ```text
-http://localhost:8080
+http://localhost:2026
 ```
 
 ---
@@ -107,10 +107,6 @@ git add .
 
 ```bash
 git commit -m "Mô tả nội dung đã thay đổi"
-```
-
-```bash
-git pull origin main
 ```
 
 ```bash
