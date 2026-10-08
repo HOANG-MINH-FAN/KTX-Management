@@ -108,6 +108,9 @@ git add .
 ```bash
 git commit -m "Mô tả nội dung đã thay đổi"
 ```
+```bash
+git pull origin main --rebase
+```
 
 ```bash
 git push origin main
