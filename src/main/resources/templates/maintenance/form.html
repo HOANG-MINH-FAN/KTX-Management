@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo sửa chữa | KTX Management</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; font-family: Arial, sans-serif;
+            background: #0f1117; color: #f1f5f9;
+        }
+        .sidebar {
+            width: 298px; position: fixed; inset: 0 auto 0 0;
+            background: #171c29; border-right: 1px solid #293248;
+            display: flex; flex-direction: column;
+        }
+        .brand {
+            padding: 28px 18px; border-bottom: 1px solid #293248;
+            font-size: 22px; font-weight: bold;
+        }
+        .menu { padding: 24px 16px; }
+        .menu small { color: #647da8; letter-spacing: 1px; }
+        .menu a {
+            display: block; color: #9bb4dd; text-decoration: none;
+            padding: 15px 8px; border-radius: 8px; margin-top: 5px;
+        }
+        .menu a:hover, .menu a.active { background: #202941; color: white; }
+        .main { margin-left: 298px; }
+        .topbar {
+            padding: 22px 36px; background: #171c29;
+            border-bottom: 1px solid #293248;
+        }
+        .topbar h2 { margin: 0 0 8px; font-size: 24px; }
+        .muted { color: #7189b1; }
+        .content { padding: 36px; max-width: 1000px; }
+        .card {
+            background: #1b2235; border: 1px solid #293248;
+            border-radius: 14px; overflow: hidden;
+        }
+        .card-title {
+            padding: 22px 26px; border-bottom: 1px solid #293248;
+            font-size: 19px; font-weight: bold;
+        }
+        .card-body { padding: 26px; }
+        .room {
+            padding: 15px; background: #202941; border-radius: 9px;
+            margin-bottom: 24px; color: #8db8ff;
+        }
+        label { display: block; margin: 18px 0 9px; color: #9bb4dd; }
+        input, textarea {
+            width: 100%; padding: 13px 14px; border-radius: 8px;
+            border: 1px solid #34415c; background: #151b2a;
+            color: #f1f5f9; font: inherit;
+        }
+        input:focus, textarea:focus { outline: 1px solid #568cff; }
+        textarea { resize: vertical; min-height: 140px; }
+        .btn {
+            display: inline-block; border: 0; border-radius: 8px;
+            padding: 12px 18px; text-decoration: none; cursor: pointer;
+            font-size: 15px; margin-top: 22px;
+        }
+        .primary { background: #477ef0; color: white; }
+        .secondary { background: #202941; color: #b5c8e8; }
+        .success, .error { padding: 12px; border-radius: 8px; }
+        .success { background: #12382f; color: #5ee0b2; }
+        .error { background: #401f2b; color: #ff9eac; }
+        @media(max-width: 760px) {
+            .sidebar { position: static; width: 100%; }
+            .menu { padding: 10px 16px; }
+            .main { margin-left: 0; }
+            .content { padding: 18px; }
+            .topbar { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="brand">🏠 KTX Management</div>
+    <nav class="menu">
+        <small>CỦA TÔI</small>
+        <a th:href="@{/student/dashboard}">🏠 Trang chủ</a>
+        <a th:href="@{/registrations}">📝 Đăng ký phòng</a>
+        <a th:href="@{/contracts}">📄 Hợp đồng</a>
+        <a th:href="@{/maintenance}" class="active">🔧 Sửa chữa</a>
+        <a th:href="@{/notifications}">🔔 Thông báo</a>
+    </nav>
+</aside>
+
+<div class="main">
+    <header class="topbar">
+        <h2>🔧 Báo sửa chữa</h2>
+        <div class="muted">Gửi yêu cầu hỗ trợ cho phòng đang ở</div>
+    </header>
+
+    <main class="content">
+        <p class="error" th:if="${error}" th:text="${error}"></p>
+
+        <section class="card">
+            <div class="card-title">🛠️ Thông tin sự cố</div>
+            <div class="card-body">
+                <div class="room">
+                    Phòng đang ở:
+                    <strong th:text="${room.roomNumber}"></strong>
+                </div>
+
+                <form th:action="@{/maintenance/new}" method="post">
+                    <label for="title">Tiêu đề sự cố</label>
+                    <input id="title" name="title" type="text"
+                           maxlength="150" required
+                           placeholder="Ví dụ: Đèn phòng bị hỏng">
+
+                    <label for="description">Mô tả chi tiết</label>
+                    <textarea id="description" name="description"
+                              required
+                              placeholder="Mô tả tình trạng, vị trí và thời điểm xảy ra sự cố..."></textarea>
+
+                    <button class="btn primary" type="submit">
+                        Gửi yêu cầu
+                    </button>
+                    <a class="btn secondary" th:href="@{/maintenance}">
+                        Quay lại
+                    </a>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

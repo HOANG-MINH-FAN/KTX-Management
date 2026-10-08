@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/sidebar :: head('Thông báo')}"></head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar sinh viên dùng chung -->
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+
+    <div class="main-content">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">🔔 Thông báo</div>
+                <div class="topbar-subtitle">
+                    Các thông báo và cập nhật từ hệ thống
+                </div>
+            </div>
+        </div>
+
+        <main class="page-content">
+
+            <!-- Tổng số thông báo chưa đọc -->
+            <section class="card" style="margin-bottom: 20px;">
+                <div class="card-body">
+
+                    <div style="display:flex;
+                                justify-content:space-between;
+                                align-items:center;
+                                flex-wrap:wrap;
+                                gap:15px;">
+
+                        <div>
+                            <div style="font-size:20px;
+                                        font-weight:600;
+                                        margin-bottom:6px;">
+                                📬 Thông báo của tôi
+                            </div>
+
+                            <div style="color:#7189b1;">
+                                Bạn có
+                                <strong th:text="${unreadCount}"
+                                        style="color:#4f8ef7;">
+                                    0
+                                </strong>
+                                thông báo chưa đọc
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- Không có thông báo -->
+            <section class="card"
+                     th:if="${notifications == null or notifications.isEmpty()}">
+
+                <div class="card-body"
+                     style="text-align:center; padding:50px;">
+
+                    <div style="font-size:45px; margin-bottom:15px;">
+                        🔔
+                    </div>
+
+                    <div style="font-size:18px; font-weight:600;">
+                        Bạn chưa có thông báo nào
+                    </div>
+
+                    <div style="color:#7189b1; margin-top:8px;">
+                        Khi có cập nhật mới, thông báo sẽ xuất hiện tại đây.
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Danh sách thông báo -->
+            <div th:if="${notifications != null and !notifications.isEmpty()}">
+
+                <div th:each="n : ${notifications}"
+                     class="card"
+                     style="margin-bottom:15px;">
+
+                    <div class="card-body">
+
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:flex-start;
+                                    gap:20px;">
+
+                            <!-- Nội dung -->
+                            <div style="flex:1;">
+
+                                <div style="display:flex;
+                                            align-items:center;
+                                            gap:10px;
+                                            margin-bottom:10px;">
+
+                                    <span style="font-size:22px;">
+                                        🔔
+                                    </span>
+
+                                    <div style="font-size:18px;
+                                                font-weight:600;"
+                                         th:text="${n.title}">
+                                        Tiêu đề
+                                    </div>
+
+                                </div>
+
+                                <div style="color:#dce5f5;
+                                            line-height:1.6;
+                                            margin-bottom:12px;"
+                                     th:text="${n.message}">
+                                    Nội dung thông báo
+                                </div>
+
+                                <div style="color:#7189b1;
+                                            font-size:14px;">
+
+                                    <span th:if="${n.createdAt != null}"
+                                          th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                        06/10/2026 20:00
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Trạng thái -->
+                            <div style="flex-shrink:0;">
+
+                                <span th:if="${!n.read}"
+                                      style="display:inline-block;
+                                             padding:6px 10px;
+                                             border-radius:7px;
+                                             background:#182f50;
+                                             color:#8db8ff;
+                                             font-size:13px;">
+                                    Chưa đọc
+                                </span>
+
+                                <span th:if="${n.read}"
+                                      style="display:inline-block;
+                                             padding:6px 10px;
+                                             border-radius:7px;
+                                             background:#12382f;
+                                             color:#5ee0b2;
+                                             font-size:13px;">
+                                    Đã đọc
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Nút đánh dấu đã đọc -->
+                        <div th:if="${!n.read}"
+                             style="margin-top:18px;
+                                    padding-top:15px;
+                                    border-top:1px solid #293248;">
+
+                            <form th:action="@{/notifications/{id}/read(id=${n.id})}"
+                                  method="post">
+
+                                <button class="btn btn-primary"
+                                        type="submit">
+                                    ✓ Đánh dấu đã đọc
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Quay lại dashboard -->
+            <div style="margin-top:20px;">
+                <a sec:authorize="hasRole('STUDENT')"
+                th:href="@{/student/dashboard}"
+                style="color:#8db8ff; text-decoration:none;">
+                    ← Quay lại trang sinh viên
+                </a>
+
+                <a sec:authorize="hasRole('ADMIN')"
+                th:href="@{/admin/dashboard}"
+                style="color:#8db8ff; text-decoration:none;">
+                    ← Quay lại trang quản trị
+                </a>
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+</body>
+</html>

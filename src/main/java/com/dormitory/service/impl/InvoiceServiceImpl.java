@@ -7,6 +7,8 @@ import com.dormitory.entity.enums.PaymentMethod;
 import com.dormitory.fee.*;
 import com.dormitory.repository.*;
 import com.dormitory.service.InvoiceService;
+import com.dormitory.service.NotificationService;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,41 +18,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * ============================================================
- * Implementation của InvoiceService.
- *
- * TÂM ĐIỂM OOP: createInvoice() sử dụng đa hình (Polymorphism)
- * qua hệ thống phí AbstractFee:
- *
- *   List<AbstractFee> feeItems = new ArrayList<>();
- *   feeItems.add(new RoomFee(...));         // Phí phòng
- *   feeItems.add(new ElectricityFee(...));  // Phí điện
- *   feeItems.add(new WaterFee(...));        // Phí nước
- *   if (hasServiceFee)
- *     feeItems.add(new ServiceFee(...));    // Phí dịch vụ
- *
- *   // Đa hình: gọi calculateFee() cho từng loại mà không cần instanceof
- *   for (AbstractFee fee : feeItems) {
- *       BigDecimal amount = fee.calculateFee(); // override khác nhau
- *       // Tạo InvoiceDetail từ fee
- *   }
- * ============================================================
- */
 @Service
 @Transactional
 public class InvoiceServiceImpl implements InvoiceService {
 
-    private final InvoiceRepository       invoiceRepository;
-    private final ContractRepository      contractRepository;
-    private final PaymentRepository       paymentRepository;
+    private final InvoiceRepository invoiceRepository;
+    private final ContractRepository contractRepository;
+    private final PaymentRepository paymentRepository;
+    private final NotificationService notificationService;
 
-    public InvoiceServiceImpl(InvoiceRepository  invoiceRepository,
-                              ContractRepository contractRepository,
-                              PaymentRepository  paymentRepository) {
-        this.invoiceRepository  = invoiceRepository;
+    public InvoiceServiceImpl(
+            InvoiceRepository invoiceRepository,
+            ContractRepository contractRepository,
+            PaymentRepository paymentRepository,
+            NotificationService notificationService) {
+        this.invoiceRepository = invoiceRepository;
         this.contractRepository = contractRepository;
-        this.paymentRepository  = paymentRepository;
+        this.paymentRepository = paymentRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -77,112 +62,118 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceRepository.findByStatusOrderByDueDateAsc(InvoiceStatus.UNPAID);
     }
 
-    /**
-     * ============================================================
-     * Tạo hóa đơn tháng — Áp dụng OOP Polymorphism.
-     *
-     * Quy trình:
-     * 1. Tạo Invoice entity (header hóa đơn)
-     * 2. Tạo các lớp Fee con (RoomFee, ElectricityFee, WaterFee...)
-     * 3. Duyệt qua List<AbstractFee> → gọi calculateFee() đa hình
-     * 4. Tạo InvoiceDetail từ kết quả mỗi Fee
-     * 5. Tính tổng và lưu Invoice
-     * ============================================================
-     */
     @Override
-    public Invoice createInvoice(Long contractId, int month, int year,
-                                 int prevElecReading, int currElecReading,
-                                 int prevWaterReading, int currWaterReading,
-                                 BigDecimal pricePerKwh, BigDecimal pricePerM3,
-                                 BigDecimal serviceFeeAmount) {
+    public Invoice createInvoice(
+            Long contractId,
+            int month,
+            int year,
+            int prevElecReading,
+            int currElecReading,
+            int prevWaterReading,
+            int currWaterReading,
+            BigDecimal pricePerKwh,
+            BigDecimal pricePerM3,
+            BigDecimal serviceFeeAmount) {
 
-        // Bước 1: Kiểm tra hợp đồng
         Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hợp đồng ID: " + contractId));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy hợp đồng ID: " + contractId));
 
-        // Kiểm tra trùng hóa đơn
-        if (invoiceRepository.existsByContractIdAndPeriodMonthAndPeriodYear(contractId, month, year)) {
-            throw new IllegalStateException("Hóa đơn tháng " + month + "/" + year
-                    + " cho hợp đồng này đã tồn tại.");
+        if (invoiceRepository.existsByContractIdAndPeriodMonthAndPeriodYear(
+                contractId, month, year)) {
+            throw new IllegalStateException(
+                    "Hóa đơn tháng " + month + "/" + year
+                            + " cho hợp đồng này đã tồn tại.");
         }
 
-        // Bước 2: Tạo Invoice (header)
         Invoice invoice = new Invoice();
         invoice.setContract(contract);
         invoice.setPeriodMonth(month);
         invoice.setPeriodYear(year);
         invoice.setStatus(InvoiceStatus.UNPAID);
-        // Hạn thanh toán: cuối tháng kế tiếp
-        invoice.setDueDate(LocalDate.of(year, month, 1).plusMonths(1).withDayOfMonth(15));
+        invoice.setDueDate(
+                LocalDate.of(year, month, 1)
+                        .plusMonths(1)
+                        .withDayOfMonth(15));
 
-        // Bước 3: Xây dựng danh sách các khoản phí (OOP Polymorphism)
-        // ============================================================
-        // Đây là điểm áp dụng đa hình: code gọi fee.calculateFee()
-        // mà không cần biết fee là loại nào — RoomFee, ElectricityFee, hay WaterFee.
-        // ============================================================
         List<AbstractFee> feeItems = new ArrayList<>();
 
-        // Phí phòng (1 tháng)
         feeItems.add(new RoomFee(contract.getMonthlyFee(), 1));
 
-        // Phí điện (nếu có tiêu thụ)
         if (currElecReading > prevElecReading) {
-            feeItems.add(new ElectricityFee(pricePerKwh, prevElecReading, currElecReading));
+            feeItems.add(new ElectricityFee(
+                    pricePerKwh, prevElecReading, currElecReading));
         }
 
-        // Phí nước (nếu có tiêu thụ)
         if (currWaterReading > prevWaterReading) {
-            feeItems.add(new WaterFee(pricePerM3, prevWaterReading, currWaterReading));
+            feeItems.add(new WaterFee(
+                    pricePerM3, prevWaterReading, currWaterReading));
         }
 
-        // Phí dịch vụ (nếu có)
-        if (serviceFeeAmount != null && serviceFeeAmount.compareTo(BigDecimal.ZERO) > 0) {
-            feeItems.add(new ServiceFee("Phí dịch vụ tháng " + month + "/" + year, serviceFeeAmount));
+        if (serviceFeeAmount != null
+                && serviceFeeAmount.compareTo(BigDecimal.ZERO) > 0) {
+            feeItems.add(new ServiceFee(
+                    "Phí dịch vụ tháng " + month + "/" + year,
+                    serviceFeeAmount));
         }
 
-        // Bước 4: Tính phí bằng đa hình → tạo InvoiceDetail
         List<InvoiceDetail> details = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (AbstractFee fee : feeItems) {
-            // GỌI ĐA HÌNH: mỗi lớp con override calculateFee() khác nhau
             BigDecimal feeAmount = fee.calculateFee();
 
             InvoiceDetail detail = new InvoiceDetail(
-                invoice,
-                FeeType.valueOf(fee.getFeeTypeName()),  // Enum từ String
-                fee.getDescription(),
-                fee.getQuantity(),
-                fee.getUnitPrice(),
-                feeAmount
-            );
+                    invoice,
+                    FeeType.valueOf(fee.getFeeTypeName()),
+                    fee.getDescription(),
+                    fee.getQuantity(),
+                    fee.getUnitPrice(),
+                    feeAmount);
+
             details.add(detail);
             totalAmount = totalAmount.add(feeAmount);
         }
 
-        // Bước 5: Gán details và total → lưu
         invoice.setDetails(details);
         invoice.setTotalAmount(totalAmount);
 
-        return invoiceRepository.save(invoice);
-    }
+        // Lưu hóa đơn
+        Invoice savedInvoice = invoiceRepository.save(invoice);
 
-    /**
-     * Ghi nhận thanh toán hóa đơn.
-     * Nếu tổng tiền đã trả >= totalAmount → đánh dấu PAID.
-     */
-    @Override
-    public void recordPayment(Long invoiceId, BigDecimal amountPaid,
-                              String paymentMethodStr, String note) {
+        // Thông báo cho sinh viên thuộc hợp đồng
+        Student student = contract.getStudent();
 
-        Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hóa đơn ID: " + invoiceId));
-
-        if (invoice.isPaid()) {
-            throw new IllegalStateException("Hóa đơn này đã được thanh toán đầy đủ.");
+        if (student != null) {
+            notificationService.createNotification(
+                    student.getId(),
+                    "INVOICE",
+                    "Hóa đơn mới",
+                    "Bạn có hóa đơn tháng " + month + "/" + year
+                            + ". Tổng tiền: " + totalAmount + " VNĐ.",
+                    "INVOICE",
+                    savedInvoice.getId());
         }
 
-        // Tạo bản ghi thanh toán
+        return savedInvoice;
+    }
+
+    @Override
+    public void recordPayment(
+            Long invoiceId,
+            BigDecimal amountPaid,
+            String paymentMethodStr,
+            String note) {
+
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy hóa đơn ID: " + invoiceId));
+
+        if (invoice.isPaid()) {
+            throw new IllegalStateException(
+                    "Hóa đơn này đã được thanh toán đầy đủ.");
+        }
+
         PaymentMethod method;
         try {
             method = PaymentMethod.valueOf(paymentMethodStr);
@@ -190,12 +181,14 @@ public class InvoiceServiceImpl implements InvoiceService {
             method = PaymentMethod.CASH;
         }
 
-        Payment payment = new Payment(invoice, amountPaid, LocalDate.now(), method);
+        Payment payment = new Payment(
+                invoice, amountPaid, LocalDate.now(), method);
         payment.setNote(note);
         paymentRepository.save(payment);
 
-        // Kiểm tra tổng tiền đã trả
-        BigDecimal totalPaid = paymentRepository.getTotalPaidForInvoice(invoiceId);
+        BigDecimal totalPaid =
+                paymentRepository.getTotalPaidForInvoice(invoiceId);
+
         if (totalPaid.compareTo(invoice.getTotalAmount()) >= 0) {
             invoice.setStatus(InvoiceStatus.PAID);
             invoiceRepository.save(invoice);
@@ -214,3 +207,4 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceRepository.countByStatus(status);
     }
 }
+

@@ -75,7 +75,12 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
                 // Chỉ STUDENT
-                .requestMatchers("/student/**").hasRole("STUDENT")
+                .requestMatchers("/student/**", "/maintenance/**")
+                    .hasRole("STUDENT")
+
+                // Chỉ ADMIN quản lý yêu cầu sửa chữa
+                .requestMatchers("/admin/maintenance/**")
+                    .hasRole("ADMIN")
 
                 // Cả hai role (đăng ký, hợp đồng)
                 .requestMatchers("/registrations/**", "/contracts/**").authenticated()

@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yêu cầu sửa chữa | KTX Management</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial,sans-serif; background: #0f1117; color: #f1f5f9; }
+        .sidebar { width: 298px; position: fixed; inset: 0 auto 0 0; background: #171c29; border-right: 1px solid #293248; }
+        .brand { padding: 28px 18px; border-bottom: 1px solid #293248; font-size: 22px; font-weight: bold; }
+        .menu { padding: 24px 16px; }
+        .menu small { color: #647da8; letter-spacing: 1px; }
+        .menu a { display: block; color: #9bb4dd; text-decoration: none; padding: 15px 8px; border-radius: 8px; margin-top: 5px; }
+        .menu a:hover, .menu a.active { background: #202941; color: white; }
+        .main { margin-left: 298px; }
+        .topbar { padding: 22px 36px; background: #171c29; border-bottom: 1px solid #293248; }
+        .topbar h2 { margin: 0 0 8px; font-size: 24px; }
+        .muted { color: #7189b1; }
+        .content { padding: 32px 36px; }
+        .card { background: #1b2235; border: 1px solid #293248; border-radius: 14px; overflow: hidden; }
+        .card-title { padding: 20px 24px; border-bottom: 1px solid #293248; font-size: 19px; font-weight: bold; }
+        .card-body { padding: 22px; }
+        .btn { display: inline-block; background: #477ef0; color: white; text-decoration: none; border-radius: 8px; padding: 11px 16px; margin-bottom: 20px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        th, td { padding: 15px 12px; border-bottom: 1px solid #293248; text-align: left; vertical-align: top; }
+        th { color: #9bb4dd; background: #202941; font-weight: 600; }
+        td { color: #dce5f5; }
+        .description { white-space: pre-wrap; min-width: 160px; }
+        .status { display: inline-block; padding: 6px 10px; border-radius: 7px; background: #3b321d; color: #ffd47a; white-space: nowrap; }
+        .status.done { background: #12382f; color: #5ee0b2; }
+        .status.progress { background: #182f50; color: #8db8ff; }
+        .status.rejected { background: #401f2b; color: #ff9eac; }
+        .empty { text-align: center; color: #7189b1; padding: 45px 15px; }
+        .success, .error { padding: 12px; border-radius: 8px; }
+        .success { background: #12382f; color: #5ee0b2; }
+        .error { background: #401f2b; color: #ff9eac; }
+        .back { color: #8db8ff; text-decoration: none; }
+        @media(max-width: 760px) {
+            .sidebar { position: static; width: 100%; }
+            .menu { padding: 10px 16px; }
+            .main { margin-left: 0; }
+            .content { padding: 18px; }
+            .topbar { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="brand">🏠 KTX Management</div>
+    <nav class="menu">
+        <small>CỦA TÔI</small>
+        <a th:href="@{/student/dashboard}">🏠 Trang chủ</a>
+        <a th:href="@{/registrations}">📝 Đăng ký phòng</a>
+        <a th:href="@{/contracts}">📄 Hợp đồng</a>
+        <a th:href="@{/maintenance}" class="active">🔧 Sửa chữa</a>
+        <a th:href="@{/notifications}">🔔 Thông báo</a>
+    </nav>
+</aside>
+
+<div class="main">
+    <header class="topbar">
+        <h2>🔧 Yêu cầu sửa chữa</h2>
+        <div class="muted">Theo dõi tiến độ xử lý sự cố phòng ở</div>
+    </header>
+
+    <main class="content">
+        <p class="success" th:if="${success}" th:text="${success}"></p>
+        <p class="error" th:if="${error}" th:text="${error}"></p>
+
+        <a class="btn" th:href="@{/maintenance/new}">＋ Gửi yêu cầu mới</a>
+
+        <section class="card">
+            <div class="card-title">📋 Danh sách yêu cầu của tôi</div>
+            <div class="card-body">
+                <div class="table-wrap"
+                     th:if="${requests != null and !requests.isEmpty()}">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Phòng</th><th>Sự cố</th><th>Mô tả</th>
+                            <th>Ngày gửi</th><th>Trạng thái</th><th>Phản hồi</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="r : ${requests}">
+                            <td th:text="${r.room.roomNumber}"></td>
+                            <td th:text="${r.title}"></td>
+                            <td class="description" th:text="${r.description}"></td>
+                            <td th:text="${r.createdAt != null ? #temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm') : 'Chưa có'}"></td>
+                            <td>
+                                <span class="status"
+                                      th:classappend="${r.status == 'COMPLETED' ? ' done' : (r.status == 'IN_PROGRESS' ? ' progress' : (r.status == 'REJECTED' ? ' rejected' : ''))}"
+                                      th:switch="${r.status}">
+                                    <span th:case="'PENDING'">Chờ tiếp nhận</span>
+                                    <span th:case="'IN_PROGRESS'">Đang sửa chữa</span>
+                                    <span th:case="'COMPLETED'">Đã hoàn thành</span>
+                                    <span th:case="'REJECTED'">Đã từ chối</span>
+                                    <span th:case="*" th:text="${r.status}"></span>
+                                </span>
+                            </td>
+                            <td th:text="${r.adminNote != null and !r.adminNote.isBlank() ? r.adminNote : 'Chưa có phản hồi'}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="empty"
+                     th:if="${requests == null or requests.isEmpty()}">
+                    <div style="font-size: 35px; margin-bottom: 12px;">🛠️</div>
+                    Bạn chưa gửi yêu cầu sửa chữa nào.
+                </div>
+            </div>
+        </section>
+
+        <p><a class="back" th:href="@{/student/dashboard}">← Quay lại trang sinh viên</a></p>
+    </main>
+</div>
+</body>
+</html>
