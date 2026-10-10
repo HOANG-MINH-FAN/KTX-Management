@@ -9,8 +9,16 @@
 
 <div class="layout">
 
-    <!-- Sidebar sinh viên dùng chung -->
-    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+    
+        <!-- Hien thi sidebar theo vai tro dang dang nhap -->
+        <th:block sec:authorize="hasRole('ADMIN')">
+            <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+        </th:block>
+
+        <th:block sec:authorize="hasRole('STUDENT')">
+            <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+        </th:block>
+
 
     <div class="main-content">
 
