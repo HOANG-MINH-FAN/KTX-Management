@@ -50,4 +50,12 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
      */
     @Query("SELECT COUNT(DISTINCT c.student) FROM Contract c WHERE c.status = 'ACTIVE'")
     long countStudentsWithActiveContract();
+
+    /**
+     * Tìm kiếm sinh viên theo tên hoặc mã SV (keyword).
+     */
+    @Query("SELECT s FROM Student s WHERE LOWER(s.fullName) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+           "OR LOWER(s.studentCode) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+           "OR LOWER(s.username) LIKE LOWER(CONCAT('%', :kw, '%'))")
+    List<Student> searchByKeyword(@Param("kw") String keyword);
 }

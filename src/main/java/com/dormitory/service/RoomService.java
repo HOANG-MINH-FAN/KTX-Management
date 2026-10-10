@@ -30,4 +30,7 @@ public interface RoomService {
 
     /** Cập nhật trạng thái phòng. */
     void updateRoomStatus(Long roomId, RoomStatus status);
+
+    /** Tìm kiếm phòng. */
+    List<Room> searchRooms(Long buildingId, RoomStatus status, com.dormitory.entity.enums.RoomType roomType);
 }

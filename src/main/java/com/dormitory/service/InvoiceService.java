@@ -23,6 +23,9 @@ public interface InvoiceService {
     /** Hóa đơn chưa thanh toán. */
     List<Invoice> findUnpaidInvoices();
 
+    /** Tất cả hóa đơn (dùng cho admin list toàn bộ). */
+    List<Invoice> findAllInvoices();
+
     /**
      * Tạo hóa đơn tháng với OOP Fee calculation.
      *

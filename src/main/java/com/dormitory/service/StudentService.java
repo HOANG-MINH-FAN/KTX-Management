@@ -25,4 +25,7 @@ public interface StudentService {
     boolean existsByStudentCode(String studentCode);
 
     boolean existsByUsername(String username);
+
+    /** Tìm kiếm sinh viên theo tên hoặc mã SV (keyword). */
+    List<Student> searchByKeyword(String keyword);
 }

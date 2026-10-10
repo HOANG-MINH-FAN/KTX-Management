@@ -63,6 +63,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Invoice> findAllInvoices() {
+        return invoiceRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    @Override
     public Invoice createInvoice(
             Long contractId,
             int month,

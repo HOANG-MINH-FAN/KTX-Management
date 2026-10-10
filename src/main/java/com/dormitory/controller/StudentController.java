@@ -19,15 +19,26 @@ public class StudentController {
 
     private final StudentService  studentService;
     private final PasswordEncoder passwordEncoder;
+    private final com.dormitory.service.ContractService contractService;
+    private final com.dormitory.service.InvoiceService invoiceService;
+    private final com.dormitory.service.ViolationService violationService;
 
-    public StudentController(StudentService studentService, PasswordEncoder passwordEncoder) {
+    public StudentController(StudentService studentService, 
+                             PasswordEncoder passwordEncoder,
+                             com.dormitory.service.ContractService contractService,
+                             com.dormitory.service.InvoiceService invoiceService,
+                             com.dormitory.service.ViolationService violationService) {
         this.studentService  = studentService;
         this.passwordEncoder = passwordEncoder;
+        this.contractService = contractService;
+        this.invoiceService = invoiceService;
+        this.violationService = violationService;
     }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("students", studentService.findAll());
+    public String list(@RequestParam(required = false) String keyword, Model model) {
+        model.addAttribute("students", studentService.searchByKeyword(keyword));
+        model.addAttribute("keyword", keyword);
         return "admin/students/list";
     }
 
@@ -35,6 +46,20 @@ public class StudentController {
     public String createForm(Model model) {
         model.addAttribute("student", new Student());
         return "admin/students/form";
+    }
+
+    @GetMapping("/detail/{id}")
+    public String detail(@PathVariable Long id, Model model, RedirectAttributes ra) {
+        Student student = studentService.findById(id).orElse(null);
+        if (student == null) {
+            ra.addFlashAttribute("error", "Không tìm thấy sinh viên.");
+            return "redirect:/admin/students";
+        }
+        model.addAttribute("student", student);
+        model.addAttribute("contracts", contractService.findByStudentId(id));
+        model.addAttribute("invoices", invoiceService.findByStudentId(id));
+        model.addAttribute("violations", violationService.findByStudentId(id));
+        return "admin/students/detail";
     }
 
     @GetMapping("/edit/{id}")

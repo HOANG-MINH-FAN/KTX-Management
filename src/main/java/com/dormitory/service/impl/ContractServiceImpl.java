@@ -77,4 +77,21 @@ public class ContractServiceImpl implements ContractService {
     public long countByStatus(ContractStatus status) {
         return contractRepository.countByStatus(status);
     }
+
+    @Override
+    public void renewContract(Long contractId, java.time.LocalDate newEndDate) {
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hợp đồng ID: " + contractId));
+
+        if (!contract.isActive()) {
+            throw new IllegalStateException("Chỉ có thể gia hạn hợp đồng đang ACTIVE.");
+        }
+        
+        if (newEndDate.isBefore(contract.getEndDate()) || newEndDate.isEqual(contract.getEndDate())) {
+            throw new IllegalArgumentException("Ngày kết thúc mới phải sau ngày kết thúc hiện tại.");
+        }
+
+        contract.setEndDate(newEndDate);
+        contractRepository.save(contract);
+    }
 }

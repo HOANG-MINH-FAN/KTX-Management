@@ -24,5 +24,8 @@ public interface ContractService {
     /** Kết thúc sớm hợp đồng (TERMINATED). */
     void terminateContract(Long contractId);
 
+    /** Gia hạn hợp đồng */
+    void renewContract(Long contractId, java.time.LocalDate newEndDate);
+
     long countByStatus(ContractStatus status);
 }

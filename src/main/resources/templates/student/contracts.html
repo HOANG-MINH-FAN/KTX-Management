@@ -13,7 +13,7 @@
                 <div class="table-wrapper">
                     <table>
                         <thead>
-                            <tr><th>#</th><th>Phòng</th><th>Bắt đầu</th><th>Kết thúc</th><th>Tiền/tháng</th><th>Trạng thái</th></tr>
+                            <tr><th>#</th><th>Phòng</th><th>Bắt đầu</th><th>Kết thúc</th><th>Tiền/tháng</th><th>Trạng thái</th><th>Thao tác</th></tr>
                         </thead>
                         <tbody>
                             <tr th:each="c, i : ${contracts}">
@@ -26,6 +26,28 @@
                                     <span th:if="${c.status?.name() == 'ACTIVE'}"      class="badge badge-success">Đang hiệu lực</span>
                                     <span th:if="${c.status?.name() == 'EXPIRED'}"     class="badge badge-secondary">Hết hạn</span>
                                     <span th:if="${c.status?.name() == 'TERMINATED'}"  class="badge badge-danger">Đã kết thúc</span>
+                                </td>
+                                <td>
+                                    <div th:if="${c.status?.name() == 'ACTIVE'}">
+                                        <button class="btn btn-sm btn-primary" th:onclick="'document.getElementById(\'extend-form-' + ${c.id} + '\').style.display=\'block\''">Yêu cầu gia hạn</button>
+                                        <div th:id="'extend-form-' + ${c.id}" style="display:none; margin-top:8px; border:1px solid #eee; padding:10px; border-radius:4px;">
+                                            <form th:action="@{/student/contract-extensions/create}" method="post" style="display:flex; flex-direction:column; gap:8px;">
+                                                <input type="hidden" name="contractId" th:value="${c.id}">
+                                                <div>
+                                                    <label class="text-sm">Gia hạn đến ngày:</label>
+                                                    <input type="date" name="newEndDate" class="form-control" required>
+                                                </div>
+                                                <div>
+                                                    <label class="text-sm">Lý do (tuỳ chọn):</label>
+                                                    <input type="text" name="reason" class="form-control" placeholder="Lý do gia hạn">
+                                                </div>
+                                                <div style="display:flex; gap:6px;">
+                                                    <button class="btn btn-sm btn-success" type="submit">Gửi</button>
+                                                    <button type="button" class="btn btn-sm btn-ghost" th:onclick="'document.getElementById(\'extend-form-' + ${c.id} + '\').style.display=\'none\''">Hủy</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(contracts)}">

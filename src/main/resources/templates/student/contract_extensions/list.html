@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Lịch sử yêu cầu gia hạn')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">📝 Lịch sử yêu cầu gia hạn</div>
+            </div>
+            <a class="btn btn-primary" th:href="@{/student/contracts}">Quay lại hợp đồng</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Phòng</th>
+                                <th>Xin gia hạn đến</th>
+                                <th>Lý do</th>
+                                <th>Ngày gửi</th>
+                                <th>Trạng thái</th>
+                                <th>Ghi chú từ BQL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r, i : ${requests}">
+                                <td th:text="${i.count}"></td>
+                                <td th:text="${r.contract.room.building.name + ' - ' + r.contract.room.roomNumber}"></td>
+                                <td class="font-bold text-primary" th:text="${r.newEndDate}"></td>
+                                <td th:text="${r.reason}"></td>
+                                <td th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span th:if="${r.status.name() == 'PENDING'}"   class="badge badge-warning">Chờ duyệt</span>
+                                    <span th:if="${r.status.name() == 'APPROVED'}"  class="badge badge-success">Đã duyệt</span>
+                                    <span th:if="${r.status.name() == 'REJECTED'}"  class="badge badge-danger">Từ chối</span>
+                                </td>
+                                <td>
+                                    <span th:if="${r.status.name() == 'REJECTED'}" class="text-danger" th:text="${r.rejectReason}"></span>
+                                    <span th:if="${r.status.name() == 'APPROVED'}" class="text-success">Thành công</span>
+                                    <span th:if="${r.status.name() == 'PENDING'}" class="text-muted">Đang xem xét</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(requests)}">
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <div class="icon">📄</div>
+                                        <h3>Chưa có yêu cầu gia hạn nào</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

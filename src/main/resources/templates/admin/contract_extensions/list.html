@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Duyệt gia hạn hợp đồng')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">📝 Duyệt yêu cầu gia hạn</div>
+                <div class="topbar-subtitle" th:text="'Tổng cộng: ' + ${#lists.size(requests)} + ' yêu cầu'"></div>
+            </div>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+            <div class="card mb-6">
+                <div class="card-body">
+                    <form th:action="@{/admin/contract-extensions}" method="get" style="display:flex; gap:12px; align-items:center;">
+                        <select name="status" class="form-control" style="flex:1;">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            <option th:each="st : ${statuses}" th:value="${st}" 
+                                    th:text="${st.name() == 'PENDING' ? 'Chờ duyệt' : (st.name() == 'APPROVED' ? 'Đã duyệt' : 'Từ chối')}"
+                                    th:selected="${st == currentStatus}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">🔍 Lọc</button>
+                        <a th:href="@{/admin/contract-extensions}" class="btn btn-ghost" th:if="${currentStatus != null}">❌ Xóa lọc</a>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Sinh viên</th>
+                                <th>Phòng</th>
+                                <th>Thời hạn hiện tại</th>
+                                <th>Gia hạn đến</th>
+                                <th>Ngày yêu cầu</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r, i : ${requests}">
+                                <td th:text="${i.count}"></td>
+                                <td>
+                                    <div class="font-bold" th:text="${r.student.fullName}"></div>
+                                    <div class="text-muted text-sm" th:text="${r.student.studentCode}"></div>
+                                </td>
+                                <td th:text="${r.contract.room.building.name + ' - ' + r.contract.room.roomNumber}"></td>
+                                <td th:text="${r.contract.endDate}"></td>
+                                <td class="font-bold text-primary" th:text="${r.newEndDate}"></td>
+                                <td th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span th:if="${r.status.name() == 'PENDING'}"   class="badge badge-warning">Chờ duyệt</span>
+                                    <span th:if="${r.status.name() == 'APPROVED'}"  class="badge badge-success">Đã duyệt</span>
+                                    <span th:if="${r.status.name() == 'REJECTED'}"  class="badge badge-danger" th:title="${r.rejectReason}">Từ chối</span>
+                                </td>
+                                <td>
+                                    <div th:if="${r.status.name() == 'PENDING'}" style="display:flex; gap:6px;">
+                                        <form th:action="@{/admin/contract-extensions/approve/{id}(id=${r.id})}" method="post" onsubmit="return confirm('Phê duyệt gia hạn hợp đồng này?')">
+                                            <button class="btn btn-sm btn-success" type="submit">✅ Duyệt</button>
+                                        </form>
+                                        <button class="btn btn-sm btn-danger" th:onclick="'document.getElementById(\'reject-form-' + ${r.id} + '\').style.display=\'block\''">❌ Từ chối</button>
+                                    </div>
+                                    <div th:id="'reject-form-' + ${r.id}" style="display:none; margin-top:8px;">
+                                        <form th:action="@{/admin/contract-extensions/reject/{id}(id=${r.id})}" method="post" style="display:flex; gap:6px;">
+                                            <input type="text" name="rejectReason" class="form-control" placeholder="Lý do từ chối" required style="padding:2px 4px; font-size:0.8rem; height:28px;">
+                                            <button class="btn btn-sm btn-danger" type="submit">Xác nhận</button>
+                                        </form>
+                                    </div>
+                                    <div th:unless="${r.status.name() == 'PENDING'}" class="text-muted text-sm">
+                                        Xử lý bởi: <span th:text="${r.processedBy}"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(requests)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="icon">📄</div>
+                                        <h3>Không có yêu cầu nào</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

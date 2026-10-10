@@ -64,4 +64,13 @@ public class StudentServiceImpl implements StudentService {
     public boolean existsByUsername(String username) {
         return studentRepository.existsByUsername(username);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Student> searchByKeyword(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return studentRepository.findAll();
+        }
+        return studentRepository.searchByKeyword(keyword.trim());
+    }
 }

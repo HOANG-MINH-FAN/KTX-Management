@@ -16,6 +16,34 @@
             <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
             <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
 
+            <div class="card mb-6">
+                <div class="card-body">
+                    <form th:action="@{/admin/rooms}" method="get" style="display:flex; gap:12px; align-items:center; flex-wrap: wrap;">
+                        <select name="buildingId" class="form-control" style="flex:1;">
+                            <option value="">-- Tất cả tòa nhà --</option>
+                            <option th:each="b : ${buildings}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == buildingId}"></option>
+                        </select>
+                        
+                        <select name="roomType" class="form-control" style="flex:1;">
+                            <option value="">-- Tất cả loại phòng --</option>
+                            <option th:each="t : ${roomTypes}" th:value="${t}" 
+                                    th:text="${t.name() == 'MALE' ? 'Nam' : (t.name() == 'FEMALE' ? 'Nữ' : 'Hỗn hợp')}"
+                                    th:selected="${t == roomType}"></option>
+                        </select>
+                        
+                        <select name="status" class="form-control" style="flex:1;">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            <option th:each="st : ${statuses}" th:value="${st}" 
+                                    th:text="${st.name() == 'AVAILABLE' ? 'Còn chỗ' : (st.name() == 'FULL' ? 'Đầy' : 'Bảo trì')}"
+                                    th:selected="${st == status}"></option>
+                        </select>
+                        
+                        <button type="submit" class="btn btn-primary">🔍 Lọc</button>
+                        <a th:href="@{/admin/rooms}" class="btn btn-ghost" th:if="${buildingId != null or status != null or roomType != null}">❌ Xóa lọc</a>
+                    </form>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="table-wrapper">
                     <table>

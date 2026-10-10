@@ -44,4 +44,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
      * Kiểm tra phòng có trong tòa nhà với số phòng đó không (tránh trùng).
      */
     boolean existsByBuildingIdAndRoomNumber(Long buildingId, String roomNumber);
+
+    /**
+     * Tìm kiếm phòng theo tòa nhà và trạng thái
+     */
+    @Query("SELECT r FROM Room r WHERE (:buildingId IS NULL OR r.building.id = :buildingId) " +
+           "AND (:status IS NULL OR r.status = :status) " +
+           "AND (:roomType IS NULL OR r.roomType = :roomType)")
+    List<Room> searchRooms(@org.springframework.data.repository.query.Param("buildingId") Long buildingId,
+                           @org.springframework.data.repository.query.Param("status") RoomStatus status,
+                           @org.springframework.data.repository.query.Param("roomType") com.dormitory.entity.enums.RoomType roomType);
 }

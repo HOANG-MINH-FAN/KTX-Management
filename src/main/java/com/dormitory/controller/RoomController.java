@@ -30,11 +30,25 @@ public class RoomController {
     }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("rooms",     roomService.findAll());
+    public String list(@RequestParam(required = false) Long buildingId,
+                       @RequestParam(required = false) RoomStatus status,
+                       @RequestParam(required = false) RoomType roomType,
+                       Model model) {
+        if (buildingId != null || status != null || roomType != null) {
+            model.addAttribute("rooms", roomService.searchRooms(buildingId, status, roomType));
+        } else {
+            model.addAttribute("rooms", roomService.findAll());
+        }
+
         model.addAttribute("buildings", buildingService.findAll());
         model.addAttribute("roomTypes", RoomType.values());
         model.addAttribute("statuses",  RoomStatus.values());
+
+        // Pass filter values back to view
+        model.addAttribute("buildingId", buildingId);
+        model.addAttribute("status", status);
+        model.addAttribute("roomType", roomType);
+
         return "admin/rooms/list";
     }
 

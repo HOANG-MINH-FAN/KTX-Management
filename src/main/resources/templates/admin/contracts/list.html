@@ -35,11 +35,17 @@
                                     <span th:if="${c.status?.name() == 'TERMINATED'}"  class="badge badge-danger">Đã kết thúc</span>
                                 </td>
                                 <td>
-                                    <form th:if="${c.status?.name() == 'ACTIVE'}"
-                                          th:action="@{/admin/contracts/terminate/{id}(id=${c.id})}" method="post"
-                                          onsubmit="return confirm('Kết thúc sớm hợp đồng này?')">
-                                        <button class="btn btn-sm btn-danger" type="submit">🔚 Kết thúc</button>
-                                    </form>
+                                    <div th:if="${c.status?.name() == 'ACTIVE'}" style="display:flex; flex-direction:column; gap:8px;">
+                                        <form th:action="@{/admin/contracts/terminate/{id}(id=${c.id})}" method="post"
+                                              onsubmit="return confirm('Kết thúc sớm hợp đồng này?')">
+                                            <button class="btn btn-sm btn-danger" style="width:100%;" type="submit">🔚 Kết thúc</button>
+                                        </form>
+                                        <form th:action="@{/admin/contracts/renew/{id}(id=${c.id})}" method="post"
+                                              style="display:flex; gap:6px;">
+                                            <input type="date" name="newEndDate" class="form-control" style="padding:2px 4px; font-size:0.8rem; height:28px;" required>
+                                            <button class="btn btn-sm btn-success" type="submit">Gia hạn</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(contracts)}">

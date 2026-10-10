@@ -16,6 +16,16 @@
             <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
             <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
 
+            <div class="card mb-6">
+                <div class="card-body">
+                    <form th:action="@{/admin/students}" method="get" style="display:flex; gap:12px; align-items:center;">
+                        <input type="text" name="keyword" class="form-control" placeholder="Tìm theo mã, tên, username..." th:value="${keyword}" style="flex:1;">
+                        <button type="submit" class="btn btn-primary">🔍 Tìm kiếm</button>
+                        <a th:href="@{/admin/students}" class="btn btn-ghost" th:if="${keyword != null and keyword != ''}">❌ Xóa lọc</a>
+                    </form>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="table-wrapper">
                     <table>
@@ -46,10 +56,11 @@
                                 </td>
                                 <td>
                                     <div style="display:flex; gap:6px;">
-                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/students/edit/{id}(id=${s.id})}">✏️</a>
+                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/students/detail/{id}(id=${s.id})}" title="Xem chi tiết">👁️</a>
+                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/students/edit/{id}(id=${s.id})}" title="Chỉnh sửa">✏️</a>
                                         <form th:action="@{/admin/students/delete/{id}(id=${s.id})}" method="post"
                                               onsubmit="return confirm('Xóa sinh viên này?')">
-                                            <button class="btn btn-sm btn-danger" type="submit">🗑️</button>
+                                            <button class="btn btn-sm btn-danger" type="submit" title="Xóa">🗑️</button>
                                         </form>
                                     </div>
                                 </td>

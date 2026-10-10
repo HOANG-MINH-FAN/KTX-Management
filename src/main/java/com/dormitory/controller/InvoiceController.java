@@ -36,7 +36,7 @@ public class InvoiceController {
 
     @GetMapping("/admin/invoices")
     public String adminList(Model model) {
-        model.addAttribute("invoices",   invoiceService.findUnpaidInvoices());
+        model.addAttribute("invoices",   invoiceService.findAllInvoices());
         model.addAttribute("contracts",  contractService.findAll());
         return "admin/invoices/list";
     }

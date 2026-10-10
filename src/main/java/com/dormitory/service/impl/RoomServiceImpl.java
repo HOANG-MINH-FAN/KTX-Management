@@ -68,4 +68,10 @@ public class RoomServiceImpl implements RoomService {
         room.setStatus(status);
         roomRepository.save(room);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Room> searchRooms(Long buildingId, RoomStatus status, com.dormitory.entity.enums.RoomType roomType) {
+        return roomRepository.searchRooms(buildingId, status, roomType);
+    }
 }

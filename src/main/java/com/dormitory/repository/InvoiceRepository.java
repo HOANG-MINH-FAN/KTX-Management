@@ -46,4 +46,15 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
      * Kiểm tra hóa đơn cho kỳ này đã tồn tại chưa.
      */
     boolean existsByContractIdAndPeriodMonthAndPeriodYear(Long contractId, int month, int year);
+
+    /**
+     * Lấy tất cả hóa đơn sắp xếp mới nhất trước.
+     */
+    List<Invoice> findAllByOrderByCreatedAtDesc();
+
+    /**
+     * Lấy hóa đơn theo nhiều trạng thái.
+     */
+    @Query("SELECT i FROM Invoice i WHERE i.status IN :statuses ORDER BY i.dueDate ASC")
+    List<Invoice> findByStatusIn(@org.springframework.data.repository.query.Param("statuses") List<InvoiceStatus> statuses);
 }

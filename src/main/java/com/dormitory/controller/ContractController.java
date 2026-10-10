@@ -42,6 +42,17 @@ public class ContractController {
         return "redirect:/admin/contracts";
     }
 
+    @PostMapping("/admin/contracts/renew/{id}")
+    public String renew(@PathVariable Long id, @RequestParam String newEndDate, RedirectAttributes ra) {
+        try {
+            contractService.renewContract(id, java.time.LocalDate.parse(newEndDate));
+            ra.addFlashAttribute("success", "Gia hạn hợp đồng thành công.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/contracts";
+    }
+
     @GetMapping("/student/contracts")
     public String studentContracts(Authentication auth, Model model) {
         Student student = studentService.findByUsername(auth.getName()).orElse(null);

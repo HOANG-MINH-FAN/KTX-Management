@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Chi tiết sinh viên')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">Chi tiết Sinh viên</div>
+                <div class="topbar-subtitle" th:text="${student.fullName} + ' (' + ${student.studentCode} + ')'"></div>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/students}">🔙 Quay lại</a>
+        </div>
+        <div class="page-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Thông tin cá nhân</span>
+                </div>
+                <div class="card-body">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                        <div>
+                            <strong>Mã sinh viên:</strong> <span th:text="${student.studentCode}"></span><br><br>
+                            <strong>Họ và tên:</strong> <span th:text="${student.fullName}"></span><br><br>
+                            <strong>Tài khoản (username):</strong> <span th:text="${student.username}"></span><br><br>
+                            <strong>Khoa:</strong> <span th:text="${student.faculty ?: '—'}"></span><br><br>
+                        </div>
+                        <div>
+                            <strong>Ngày sinh:</strong> <span th:text="${student.dateOfBirth ?: '—'}"></span><br><br>
+                            <strong>Giới tính:</strong> 
+                            <span th:if="${student.gender == 'MALE'}">Nam</span>
+                            <span th:if="${student.gender == 'FEMALE'}">Nữ</span>
+                            <span th:if="${student.gender == null}">—</span><br><br>
+                            <strong>Điện thoại:</strong> <span th:text="${student.phone ?: '—'}"></span><br><br>
+                            <strong>Email:</strong> <span th:text="${student.email ?: '—'}"></span><br><br>
+                            <strong>Quê quán:</strong> <span th:text="${student.hometown ?: '—'}"></span><br><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
