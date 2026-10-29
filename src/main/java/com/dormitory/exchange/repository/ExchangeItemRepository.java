@@ -11,5 +11,7 @@ public interface ExchangeItemRepository extends JpaRepository<ExchangeItem, Long
 
     List<ExchangeItem> findByOwnerId(Long ownerId);
 
+    List<ExchangeItem> findByOwnerIdOrderByCreatedAtDesc(Long ownerId);
+
     List<ExchangeItem> findByCategoryAndStatus(String category, String status);
 }

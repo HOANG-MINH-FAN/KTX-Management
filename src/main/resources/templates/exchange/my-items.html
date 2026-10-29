@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Tin đăng của tôi')}"></head>
+<body>
+<div class="layout">
+    <!-- Sidebar sinh viên -->
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">📦 Quản lý tin đăng cá nhân</div>
+                <div class="topbar-subtitle" th:text="'Sinh viên: ' + ${student?.fullName} + ' (' + ${student?.studentCode} + ')'"></div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <a th:href="@{/exchange}" class="btn btn-ghost btn-sm">
+                    🔄 Xem Chợ đồ dùng
+                </a>
+                <a th:href="@{/exchange/my-items/new}" class="btn btn-primary btn-sm">
+                    ➕ Đăng tin mới
+                </a>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <!-- Thông báo kết quả thao tác (Flash Attributes) -->
+            <div class="alert alert-success" th:if="${success}">
+                ✅ <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                ❌ <span th:text="${error}"></span>
+            </div>
+            <div class="alert alert-warning" th:if="${warning}">
+                ⚠️ <span th:text="${warning}"></span>
+            </div>
+
+            <!-- Thống kê tin đăng -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 24px;">
+                <div class="stat-card blue">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-value" th:text="${totalCount}">0</div>
+                    <div class="stat-label">Tổng tin đăng</div>
+                </div>
+
+                <div class="stat-card green">
+                    <div class="stat-icon">🟢</div>
+                    <div class="stat-value" th:text="${availableCount}">0</div>
+                    <div class="stat-label">Đang hiển thị (AVAILABLE)</div>
+                </div>
+
+                <div class="stat-card yellow">
+                    <div class="stat-icon">🔒</div>
+                    <div class="stat-value" th:text="${closedCount}">0</div>
+                    <div class="stat-label">Đang ẩn (CLOSED)</div>
+                </div>
+
+                <div class="stat-card purple">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-value" th:text="${withRequestsCount}">0</div>
+                    <div class="stat-label">Tin có yêu cầu giao dịch</div>
+                </div>
+            </div>
+
+            <!-- Bảng danh sách tin đăng -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        📋 Danh sách tin của bạn (<span th:text="${totalCount}"></span>)
+                    </div>
+                    <div class="text-sm text-muted">
+                        Chỉ có thể xóa vĩnh viễn tin chưa có yêu cầu; tin có yêu cầu chỉ được ẩn.
+                    </div>
+                </div>
+
+                <div class="card-body" style="padding: 0;">
+
+                    <!-- Trạng thái trống -->
+                    <div class="empty-state" th:if="${itemViews.isEmpty()}">
+                        <div class="icon">📦</div>
+                        <h3>Bạn chưa có tin đăng trao đổi nào</h3>
+                        <p>Hãy đăng bán, trao đổi hoặc cho tặng đồ dùng mà bạn không còn nhu cầu sử dụng trong KTX.</p>
+                        <a th:href="@{/exchange/my-items/new}" class="btn btn-primary" style="margin-top: 16px;">
+                            🚀 Đăng tin đầu tiên ngay
+                        </a>
+                    </div>
+
+                    <!-- Danh sách có tin -->
+                    <div class="table-wrapper" th:unless="${itemViews.isEmpty()}" style="border:none; border-radius:0;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 70px;">Ảnh</th>
+                                    <th>Tên đồ dùng</th>
+                                    <th>Danh mục</th>
+                                    <th>Hình thức & Giá</th>
+                                    <th>Tình trạng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Yêu cầu</th>
+                                    <th style="text-align: right; min-width: 220px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="iv : ${itemViews}">
+                                    <!-- Ảnh thu nhỏ -->
+                                    <td>
+                                        <div style="width: 50px; height: 50px; border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-secondary); display:flex; align-items:center; justify-content:center; border: 1px solid var(--border);">
+                                            <img th:if="${iv.item.imagePath != null}"
+                                                 th:src="${iv.item.imagePath}"
+                                                 alt="Thumbnail"
+                                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                                            <span th:unless="${iv.item.imagePath != null}" style="font-size: 1.4rem;">📦</span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Tiêu đề & ngày đăng -->
+                                    <td>
+                                        <div class="font-bold" style="color:var(--text-primary); font-size:0.95rem;" th:text="${iv.item.title}"></div>
+                                        <div class="text-muted text-sm" style="margin-top:2px;"
+                                             th:text="${#temporals.format(iv.item.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+                                    </td>
+
+                                    <!-- Danh mục -->
+                                    <td>
+                                        <span class="badge badge-secondary" th:text="${iv.item.category}"></span>
+                                    </td>
+
+                                    <!-- Hình thức & Giá / Món đổi -->
+                                    <td>
+                                        <div th:if="${iv.item.exchangeType == 'SELL'}">
+                                            <span class="badge badge-info" style="margin-bottom:4px;">💰 Bán lại</span>
+                                            <div style="font-weight:600; color:var(--accent-green); font-size:0.9rem;"
+                                                 th:text="${iv.item.price != null ? #numbers.formatDecimal(iv.item.price, 0, 'COMMA', 0, 'POINT') + ' đ' : 'Liên hệ'}"></div>
+                                        </div>
+                                        <div th:if="${iv.item.exchangeType == 'EXCHANGE'}">
+                                            <span class="badge badge-purple" style="margin-bottom:4px;">🔄 Trao đổi</span>
+                                            <div class="text-sm text-muted" th:text="'Đổi lấy: ' + ${iv.item.desiredItem}"></div>
+                                        </div>
+                                        <div th:if="${iv.item.exchangeType == 'GIVEAWAY'}">
+                                            <span class="badge badge-success">🎁 Cho tặng (0đ)</span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Tình trạng -->
+                                    <td>
+                                        <span class="text-sm" th:if="${iv.item.itemCondition == 'NEW'}">✨ Mới 100%</span>
+                                        <span class="text-sm" th:if="${iv.item.itemCondition == 'LIKE_NEW'}">👍 Như mới</span>
+                                        <span class="text-sm" th:if="${iv.item.itemCondition == 'USED'}">👌 Đã sử dụng</span>
+                                    </td>
+
+                                    <!-- Trạng thái -->
+                                    <td>
+                                        <span class="badge badge-success" th:if="${iv.item.status == 'AVAILABLE'}">🟢 Đang hiển thị</span>
+                                        <span class="badge badge-secondary" th:if="${iv.item.status == 'CLOSED'}">🔒 Đã ẩn</span>
+                                        <span class="badge badge-warning" th:if="${iv.item.status == 'PENDING'}">⏳ Đang giao dịch</span>
+                                        <span class="badge badge-purple" th:if="${iv.item.status == 'SOLD'}">🏷️ Đã bán</span>
+                                        <span class="badge badge-info" th:if="${iv.item.status == 'EXCHANGED'}">🤝 Đã trao đổi</span>
+                                    </td>
+
+                                    <!-- Yêu cầu giao dịch -->
+                                    <td>
+                                        <span class="badge badge-warning" th:if="${iv.hasRequests}" title="Đã có sinh viên gửi yêu cầu giao dịch">
+                                            💬 Có yêu cầu
+                                        </span>
+                                        <span class="text-muted text-sm" th:unless="${iv.hasRequests}">
+                                            Chưa có
+                                        </span>
+                                    </td>
+
+                                    <!-- Thao tác -->
+                                    <td style="text-align: right;">
+                                        <div style="display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+
+                                            <!-- Nút Sửa tin -->
+                                            <a th:if="${iv.canEdit}"
+                                               th:href="@{/exchange/my-items/{id}/edit(id=${iv.item.id})}"
+                                               class="btn btn-ghost btn-sm"
+                                               title="Chỉnh sửa thông tin tin đăng">
+                                                ✏️ Sửa
+                                            </a>
+                                            <button th:unless="${iv.canEdit}"
+                                                    class="btn btn-ghost btn-sm"
+                                                    disabled
+                                                    style="opacity:0.5; cursor:not-allowed;"
+                                                    title="Không thể sửa tin đã có giao dịch được chấp nhận hoặc hoàn thành">
+                                                🔒 Khóa
+                                            </button>
+
+                                            <!-- Nút Ẩn / Hiện tin (POST + CSRF) -->
+                                            <form th:if="${iv.item.status == 'AVAILABLE'}"
+                                                  th:action="@{/exchange/my-items/{id}/toggle-hide(id=${iv.item.id})}"
+                                                  method="post"
+                                                  style="display:inline;">
+                                                <button type="submit"
+                                                        class="btn btn-warning btn-sm"
+                                                        title="Ẩn tin này khỏi danh sách công khai">
+                                                    👁️‍🗨️ Ẩn tin
+                                                </button>
+                                            </form>
+
+                                            <form th:if="${iv.item.status == 'CLOSED'}"
+                                                  th:action="@{/exchange/my-items/{id}/toggle-hide(id=${iv.item.id})}"
+                                                  method="post"
+                                                  style="display:inline;">
+                                                <button type="submit"
+                                                        class="btn btn-success btn-sm"
+                                                        title="Mở lại tin để hiển thị công khai trên chợ đồ dùng">
+                                                    👁️ Mở lại
+                                                </button>
+                                            </form>
+
+                                            <!-- Nút Xóa vĩnh viễn (POST + CSRF) -->
+                                            <form th:if="${iv.canDelete}"
+                                                  th:action="@{/exchange/my-items/{id}/delete(id=${iv.item.id})}"
+                                                  method="post"
+                                                  style="display:inline;"
+                                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn tin đăng này không? Hành động này không thể hoàn tác.');">
+                                                <button type="submit"
+                                                        class="btn btn-danger btn-sm"
+                                                        title="Xóa vĩnh viễn tin đăng">
+                                                    🗑️ Xóa
+                                                </button>
+                                            </form>
+
+                                            <!-- Tin có yêu cầu: Vô hiệu hóa nút xóa và giải thích -->
+                                            <span th:unless="${iv.canDelete}"
+                                                  style="display:inline-block;"
+                                                  title="Tin đăng đã có yêu cầu giao dịch. Để giữ tính toàn vẹn lịch sử, bạn chỉ có thể chọn Ẩn tin.">
+                                                <button class="btn btn-ghost btn-sm"
+                                                        disabled
+                                                        style="opacity:0.4; cursor:not-allowed;">
+                                                    🗑️ Xóa
+                                                </button>
+                                            </span>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

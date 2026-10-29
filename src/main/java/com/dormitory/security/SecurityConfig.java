@@ -69,7 +69,7 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider())
             .authorizeHttpRequests(auth -> auth
                 // Cho phép truy cập công khai
-                .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico").permitAll()
 
                 // Chỉ ADMIN
                 .requestMatchers("/admin/**").hasRole("ADMIN")

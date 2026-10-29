@@ -1,10 +1,6 @@
 package com.dormitory.exchange.controller;
 
-import com.dormitory.entity.User;
-import com.dormitory.exchange.entity.ExchangeItem;
 import com.dormitory.exchange.service.ExchangeItemService;
-import com.dormitory.repository.UserRepository;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +10,9 @@ import org.springframework.web.bind.annotation.*;
 public class ExchangeItemController {
 
     private final ExchangeItemService service;
-    private final UserRepository userRepository;
 
-    public ExchangeItemController(ExchangeItemService service,
-                                  UserRepository userRepository) {
+    public ExchangeItemController(ExchangeItemService service) {
         this.service = service;
-        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -33,35 +26,21 @@ public class ExchangeItemController {
         return service.getById(id)
                 .map(item -> {
                     model.addAttribute("item", item);
+                    // Lấy số điện thoại chủ tin từ Student.phone nếu cần hiển thị
+                    service.getOwnerStudent(item.getOwnerId()).ifPresent(owner -> {
+                        model.addAttribute("ownerPhone", owner.getPhone());
+                        model.addAttribute("ownerName", owner.getFullName());
+                    });
                     return "exchange/detail";
                 })
                 .orElse("redirect:/exchange");
     }
 
+    /**
+     * Chuyển hướng người dùng từ URL cũ /exchange/new sang controller quản lý tin cá nhân.
+     */
     @GetMapping("/new")
-    public String createForm(Model model) {
-        model.addAttribute("item", new ExchangeItem());
-        return "exchange/form";
-    }
-
-    @PostMapping("/save")
-    public String save(@ModelAttribute ExchangeItem item,
-                       Authentication authentication) {
-
-        User user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow();
-
-        item.setOwnerId(user.getId());
-        item.setStatus("AVAILABLE");
-
-        service.save(item);
-
-        return "redirect:/exchange";
-    }
-
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
-        service.delete(id);
-        return "redirect:/exchange";
+    public String redirectToNewForm() {
+        return "redirect:/exchange/my-items/new";
     }
 }
