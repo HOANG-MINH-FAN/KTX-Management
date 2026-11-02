@@ -1,0 +1,61 @@
+/* Giao diện riêng cho Chợ trao đổi đồ dùng; sử dụng design token của style.css. */
+.exchange-page .page-content { padding: 28px 32px 48px; }
+.exchange-top-actions { display:flex; gap:10px; align-items:center; }
+.exchange-hero { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:30px 34px; margin-bottom:22px; border:1px solid var(--border); border-radius:18px; background:linear-gradient(115deg, rgba(79,142,247,.18), rgba(45,212,160,.10)), var(--bg-card); }
+.exchange-eyebrow { color:var(--accent-green); font-size:.72rem; font-weight:800; letter-spacing:.14em; }
+.exchange-hero h1 { margin:7px 0 8px; color:var(--text-primary); font-size:clamp(1.45rem, 3vw, 2rem); }
+.exchange-hero p { color:var(--text-secondary); margin:0; }
+.exchange-hero-art { display:grid; place-items:center; width:88px; height:88px; flex:0 0 88px; border-radius:24px; background:rgba(45,212,160,.13); font-size:2.8rem; }
+.exchange-filter-card { padding:22px; margin-bottom:28px; }
+.exchange-search-row { display:flex; gap:12px; }
+.exchange-search-input { display:flex; align-items:center; gap:10px; flex:1; min-width:0; padding:0 14px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-secondary); color:var(--text-secondary); }
+.exchange-search-input input { width:100%; padding:13px 0; color:var(--text-primary); border:0; outline:0; background:transparent; font:inherit; }
+.exchange-filter-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:18px; }
+.exchange-filter-grid label,.exchange-price-filter { display:flex; flex-direction:column; gap:7px; color:var(--text-secondary); font-size:.8rem; font-weight:600; }
+.exchange-filter-grid .form-control { width:100%; min-width:0; }
+.exchange-price-filter>div { display:flex; gap:8px; }
+.exchange-price-filter input { min-width:0; width:50%; }
+.exchange-filter-footer { display:flex; justify-content:space-between; align-items:center; margin-top:16px; }
+.exchange-clear { color:var(--text-secondary); font-size:.85rem; }
+.exchange-filter-message { color:var(--accent-yellow); margin:-12px 0 20px; font-size:.85rem; }
+.exchange-results-heading { display:flex; justify-content:space-between; align-items:end; gap:16px; margin:0 0 16px; }
+.exchange-results-heading h2 { color:var(--text-primary); font-size:1.2rem; margin:0 0 4px; }
+.exchange-results-heading p,.exchange-sort-label { color:var(--text-secondary); font-size:.82rem; margin:0; }
+.exchange-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+.exchange-item-card { overflow:hidden; padding:0; transition:transform .2s ease,border-color .2s ease; }
+.exchange-item-card:hover { transform:translateY(-3px); border-color:var(--accent-blue); }
+.exchange-item-image { display:block; height:205px; overflow:hidden; background:var(--bg-secondary); }
+.exchange-item-image img { width:100%; height:100%; object-fit:cover; }
+.exchange-no-image { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:8px; width:100%; height:100%; min-height:180px; color:var(--text-muted); background:linear-gradient(135deg,var(--bg-secondary),var(--bg-card)); font-size:2.6rem; }
+.exchange-no-image span { font-size:.78rem; }
+.exchange-item-body { padding:16px; }
+.exchange-item-tags { display:flex; flex-wrap:wrap; gap:7px; }
+.exchange-tag,.exchange-condition { display:inline-flex; align-items:center; border-radius:30px; padding:4px 9px; font-size:.69rem; font-weight:700; }
+.exchange-tag { color:#8bb7ff; background:rgba(79,142,247,.14); }
+.exchange-condition { color:var(--accent-green); background:rgba(45,212,160,.12); }
+.exchange-item-body h3 { margin:11px 0 4px; font-size:1rem; line-height:1.45; }
+.exchange-item-body h3 a { color:var(--text-primary); }
+.exchange-category,.exchange-detail-category { color:var(--text-secondary); font-size:.78rem; }
+.exchange-card-bottom { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:16px; padding-top:12px; border-top:1px solid var(--border); }
+.exchange-price { color:var(--accent-green); font-size:1rem; }
+.exchange-free { color:var(--accent-green); }
+.exchange-detail-link { font-size:.8rem; font-weight:700; }
+.exchange-empty { text-align:center; padding:48px 20px; }
+.exchange-empty>div { font-size:2.4rem; }
+.exchange-empty h3 { margin:12px 0 6px; }
+.exchange-empty p { color:var(--text-secondary); margin-bottom:18px; }
+.exchange-pagination { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:7px; margin-top:28px; }
+.exchange-pagination a { display:inline-flex; min-width:36px; height:36px; align-items:center; justify-content:center; padding:0 10px; border:1px solid var(--border); border-radius:8px; color:var(--text-secondary); }
+.exchange-pagination a.active,.exchange-pagination a:hover { color:white; border-color:var(--accent-blue); background:var(--accent-blue); }
+.exchange-detail-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:28px; padding:24px; }
+.exchange-detail-photo { min-height:360px; overflow:hidden; border-radius:12px; background:var(--bg-secondary); }
+.exchange-detail-photo img { width:100%; height:100%; max-height:620px; object-fit:contain; }
+.exchange-detail-content h1 { margin:12px 0 5px; font-size:clamp(1.45rem,3vw,2rem); }
+.exchange-detail-price { margin:16px 0; color:var(--accent-green); font-size:1.5rem; font-weight:800; }
+.exchange-detail-section { padding:16px 0; border-top:1px solid var(--border); }
+.exchange-detail-section h2,.exchange-contact-card h2 { margin:0 0 8px; font-size:1rem; }
+.exchange-detail-section p,.exchange-contact-card p { color:var(--text-secondary); white-space:pre-line; }
+.exchange-contact-card { margin-top:12px; padding:18px; border:1px solid var(--border); border-radius:12px; background:var(--bg-secondary); }
+.exchange-call-button { margin-top:12px; }
+@media(max-width:1100px) { .exchange-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .exchange-filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:700px) { .exchange-page .page-content { padding:18px 14px 32px; } .exchange-hero { padding:22px; } .exchange-hero-art { width:58px; height:58px; flex-basis:58px; font-size:1.8rem; } .exchange-top-actions { gap:6px; } .exchange-top-actions .btn { padding:8px 10px; font-size:.75rem; } .exchange-filter-card { padding:15px; } .exchange-search-row { flex-direction:column; } .exchange-search-row>.btn { width:100%; justify-content:center; } .exchange-filter-grid { grid-template-columns:1fr; } .exchange-grid { grid-template-columns:1fr; } .exchange-item-image { height:220px; } .exchange-detail-layout { grid-template-columns:1fr; padding:14px; gap:18px; } .exchange-detail-photo { min-height:230px; max-height:360px; } .exchange-results-heading { align-items:start; flex-direction:column; } }

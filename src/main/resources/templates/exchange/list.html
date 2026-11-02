@@ -1,40 +1,156 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Trao đổi đồ</title>
-</head>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/sidebar :: head('Chợ trao đổi đồ dùng')}"></head>
+
 <body>
+    <link rel="stylesheet" th:href="@{/css/exchange.css}">
+    <div class="layout">
+        <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+        <main class="main-content exchange-page">
+            <header class="topbar">
+                <div>
+                    <div class="topbar-title">🔄 Chợ trao đổi đồ dùng</div>
+                    <div class="topbar-subtitle">Mua bán, cho tặng và trao đổi trong cộng đồng KTX</div>
+                </div>
+                <div class="exchange-top-actions">
+                    <a th:href="@{/exchange/my-items}" class="btn btn-ghost">📦 Tin của tôi</a>
+                    <a th:href="@{/exchange/my-items/new}" class="btn btn-primary">＋ Đăng tin</a>
+                </div>
+            </header>
 
-<h1>Trao đổi đồ</h1>
+            <section class="page-content">
+                <section class="exchange-hero">
+                    <div>
+                        <span class="exchange-eyebrow">KTX EXCHANGE</span>
+                        <h1>Tìm món đồ bạn đang cần</h1>
+                        <p>Tiết kiệm chi phí, chia sẻ và kéo dài vòng đời đồ dùng trong ký túc xá.</p>
+                    </div>
+                    <div class="exchange-hero-art" aria-hidden="true">♻️</div>
+                </section>
 
-<a href="/exchange/my-items/new">Đăng tin mới</a> | <a href="/exchange/my-items">Tin đăng của tôi</a>
+                <section class="card exchange-filter-card">
+                    <form th:action="@{/exchange}" method="get">
+                        <div class="exchange-search-row">
+                            <label class="exchange-search-input">
+                                <span aria-hidden="true">⌕</span>
+                                <input type="search" name="q" th:value="${q}"
+                                    placeholder="Tìm tên món đồ, mô tả hoặc danh mục..." aria-label="Từ khóa tìm kiếm">
+                            </label>
+                            <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                        </div>
+                        <div class="exchange-filter-grid">
+                            <label><span>Danh mục</span>
+                                <select name="category" class="form-control">
+                                    <option value="">Tất cả danh mục</option>
+                                    <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"
+                                        th:selected="${category == c}"></option>
+                                </select>
+                            </label>
+                            <label><span>Hình thức</span>
+                                <select name="exchangeType" class="form-control">
+                                    <option value="">Tất cả hình thức</option>
+                                    <option value="SELL" th:selected="${exchangeType == 'SELL'}">Bán</option>
+                                    <option value="GIVEAWAY" th:selected="${exchangeType == 'GIVEAWAY'}">Cho tặng
+                                    </option>
+                                    <option value="EXCHANGE" th:selected="${exchangeType == 'EXCHANGE'}">Trao đổi
+                                    </option>
+                                </select>
+                            </label>
+                            <label><span>Tình trạng</span>
+                                <select name="itemCondition" class="form-control">
+                                    <option value="">Tất cả tình trạng</option>
+                                    <option value="NEW" th:selected="${itemCondition == 'NEW'}">Mới 100%</option>
+                                    <option value="LIKE_NEW" th:selected="${itemCondition == 'LIKE_NEW'}">Như mới
+                                    </option>
+                                    <option value="USED" th:selected="${itemCondition == 'USED'}">Đã sử dụng</option>
+                                </select>
+                            </label>
+                            <div class="exchange-price-filter"><span>Khoảng giá (VNĐ)</span>
+                                <div>
+                                    <input class="form-control" type="number" name="minPrice" min="0" step="1000"
+                                        th:value="${minPrice}" placeholder="Từ">
+                                    <input class="form-control" type="number" name="maxPrice" min="0" step="1000"
+                                        th:value="${maxPrice}" placeholder="Đến">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="exchange-filter-footer">
+                            <a th:href="@{/exchange}" class="exchange-clear">Xóa bộ lọc</a>
+                            <button type="submit" class="btn btn-ghost">Áp dụng bộ lọc</button>
+                        </div>
+                    </form>
+                </section>
 
-<hr>
+                <p class="exchange-filter-message" th:if="${filterMessage != null}" th:text="${filterMessage}"></p>
+                <div class="exchange-results-heading">
+                    <div>
+                        <h2>Tin đang được đăng</h2>
+                        <p th:text="|Tìm thấy ${resultPage.totalElements} tin phù hợp|">Các món đồ mới nhất</p>
+                    </div>
+                    <span class="exchange-sort-label">Mới nhất trước</span>
+                </div>
 
-<div th:if="${items.isEmpty()}">
-    <p>Chưa có sản phẩm nào.</p>
-</div>
+                <section class="exchange-empty card" th:if="${items.isEmpty()}">
+                    <div aria-hidden="true">🔎</div>
+                    <h3>Chưa tìm thấy món đồ phù hợp</h3>
+                    <p>Thử thay đổi từ khóa hoặc bỏ bớt bộ lọc để xem thêm tin đăng.</p>
+                    <a th:href="@{/exchange}" class="btn btn-primary">Xem tất cả tin</a>
+                </section>
 
-<div th:each="item : ${items}">
-    <h3 th:text="${item.title}"></h3>
+                <section class="exchange-grid" th:unless="${items.isEmpty()}">
+                    <article class="card exchange-item-card" th:each="item : ${items}">
+                        <a class="exchange-item-image" th:href="@{/exchange/{id}(id=${item.id})}">
+                            <img th:if="${item.imagePath != null and !#strings.isEmpty(item.imagePath)}"
+                                th:src="${item.imagePath}" th:alt="${item.title}" loading="lazy">
+                            <div class="exchange-no-image"
+                                th:unless="${item.imagePath != null and !#strings.isEmpty(item.imagePath)}">📦<span>Chưa
+                                    có hình ảnh</span></div>
+                        </a>
+                        <div class="exchange-item-body">
+                            <div class="exchange-item-tags">
+                                <span class="exchange-tag"
+                                    th:text="${item.exchangeType == 'SELL' ? 'Bán' : (item.exchangeType == 'GIVEAWAY' ? 'Cho tặng' : 'Trao đổi')}">Bán</span>
+                                <span class="exchange-condition"
+                                    th:text="${item.itemCondition == 'NEW' ? 'Mới 100%' : (item.itemCondition == 'LIKE_NEW' ? 'Như mới' : 'Đã sử dụng')}">Đã
+                                    sử dụng</span>
+                            </div>
+                            <h3><a th:href="@{/exchange/{id}(id=${item.id})}" th:text="${item.title}">Tên món đồ</a>
+                            </h3>
+                            <p class="exchange-category" th:text="${item.category}">Danh mục</p>
+                            <div class="exchange-card-bottom">
+                                <strong class="exchange-price"
+                                    th:if="${item.exchangeType == 'SELL' and item.price != null}"
+                                    th:text="|${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} đ|">0
+                                    đ</strong>
+                                <strong class="exchange-price exchange-free"
+                                    th:if="${item.exchangeType == 'GIVEAWAY' or (item.exchangeType == 'SELL' and item.price == null)}">Miễn
+                                    phí</strong>
+                                <strong class="exchange-price" th:if="${item.exchangeType == 'EXCHANGE'}">Đổi
+                                    đồ</strong>
+                                <a th:href="@{/exchange/{id}(id=${item.id})}" class="exchange-detail-link">Chi tiết
+                                    →</a>
+                            </div>
+                        </div>
+                    </article>
+                </section>
 
-    <p>
-        Loại:
-        <span th:text="${item.exchangeType}"></span>
-    </p>
-
-    <p>
-        Tình trạng:
-        <span th:text="${item.itemCondition}"></span>
-    </p>
-
-    <a th:href="@{/exchange/{id}(id=${item.id})}">
-        Xem chi tiết
-    </a>
-
-    <hr>
-</div>
-
+                <nav class="exchange-pagination" th:if="${resultPage.totalPages > 1}" aria-label="Phân trang">
+                    <a th:if="${resultPage.hasPrevious()}"
+                        th:href="@{/exchange(q=${q},category=${category},exchangeType=${exchangeType},itemCondition=${itemCondition},minPrice=${minPrice},maxPrice=${maxPrice},page=${resultPage.number - 1})}">←
+                        Trước</a>
+                    <span th:each="number : ${#numbers.sequence(0, resultPage.totalPages - 1)}">
+                        <a th:href="@{/exchange(q=${q},category=${category},exchangeType=${exchangeType},itemCondition=${itemCondition},minPrice=${minPrice},maxPrice=${maxPrice},page=${number})}"
+                            th:text="${number + 1}"
+                            th:classappend="${number == resultPage.number ? 'active' : ''}">1</a>
+                    </span>
+                    <a th:if="${resultPage.hasNext()}"
+                        th:href="@{/exchange(q=${q},category=${category},exchangeType=${exchangeType},itemCondition=${itemCondition},minPrice=${minPrice},maxPrice=${maxPrice},page=${resultPage.number + 1})}">Sau
+                        →</a>
+                </nav>
+            </section>
+        </main>
+    </div>
 </body>
+
 </html>

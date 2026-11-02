@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/sidebar :: head('Chi tiết món đồ')}"></head>
+
+<body>
+    <div class="layout">
+        <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+        <main class="main-content exchange-page">
+            <header class="topbar">
+                <div>
+                    <div class="topbar-title">🔄 Chợ trao đổi đồ dùng</div>
+                    <div class="topbar-subtitle">Thông tin chi tiết món đồ</div>
+                </div>
+                <a th:href="@{/exchange}" class="btn btn-ghost">← Quay lại chợ</a>
+            </header>
+            <section class="page-content">
+                <div class="exchange-detail-layout card">
+                    <div class="exchange-detail-photo">
+                        <img th:if="${item.imagePath != null and !#strings.isEmpty(item.imagePath)}"
+                            th:src="${item.imagePath}" th:alt="${item.title}">
+                        <div class="exchange-no-image"
+                            th:unless="${item.imagePath != null and !#strings.isEmpty(item.imagePath)}">📦<span>Chưa có
+                                hình ảnh</span></div>
+                    </div>
+                    <div class="exchange-detail-content">
+                        <div class="exchange-item-tags">
+                            <span class="exchange-tag"
+                                th:text="${item.exchangeType == 'SELL' ? 'Bán' : (item.exchangeType == 'GIVEAWAY' ? 'Cho tặng' : 'Trao đổi')}">Bán</span>
+                            <span class="exchange-condition"
+                                th:text="${item.itemCondition == 'NEW' ? 'Mới 100%' : (item.itemCondition == 'LIKE_NEW' ? 'Như mới' : 'Đã sử dụng')}">Đã
+                                sử dụng</span>
+                        </div>
+                        <h1 th:text="${item.title}">Tên món đồ</h1>
+                        <p class="exchange-detail-category" th:text="${item.category}">Danh mục</p>
+                        <div class="exchange-detail-price" th:if="${item.exchangeType == 'SELL' and item.price != null}"
+                            th:text="|${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} đ|">0 đ</div>
+                        <div class="exchange-detail-price"
+                            th:if="${item.exchangeType == 'GIVEAWAY' or (item.exchangeType == 'SELL' and item.price == null)}">
+                            Miễn phí</div>
+                        <div class="exchange-detail-price" th:if="${item.exchangeType == 'EXCHANGE'}">Ưu tiên trao đổi
+                        </div>
+                        <div class="exchange-detail-section">
+                            <h2>Mô tả sản phẩm</h2>
+                            <p class="exchange-description"
+                                th:text="${item.description != null and !#strings.isEmpty(item.description) ? item.description : 'Chủ tin chưa bổ sung mô tả.'}">
+                                Mô tả</p>
+                        </div>
+                        <div class="exchange-detail-section"
+                            th:if="${item.exchangeType == 'EXCHANGE' and item.desiredItem != null and !#strings.isEmpty(item.desiredItem)}">
+                            <h2>Mong muốn trao đổi</h2>
+                            <p th:text="${item.desiredItem}">Món đồ mong muốn</p>
+                        </div>
+                        <div class="exchange-contact-card">
+                            <h2>Thông tin người đăng</h2>
+                            <p><strong th:text="${ownerName != null ? ownerName : 'Sinh viên KTX'}">Sinh viên
+                                    KTX</strong></p>
+                            <p th:if="${ownerPhone != null and !#strings.isEmpty(ownerPhone)}">Số điện thoại: <strong
+                                    th:text="${ownerPhone}">0000000000</strong></p>
+                            <p th:unless="${ownerPhone != null and !#strings.isEmpty(ownerPhone)}">Chủ tin chưa cập nhật
+                                số điện thoại trong hồ sơ.</p>
+                            <a th:if="${ownerPhone != null and !#strings.isEmpty(ownerPhone)}"
+                                class="btn btn-primary exchange-call-button" th:href="|tel:${ownerPhone}|">☎ Liên hệ chủ
+                                tin</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>
