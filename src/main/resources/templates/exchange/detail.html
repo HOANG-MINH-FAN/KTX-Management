@@ -4,17 +4,29 @@
 <head th:replace="~{layout/sidebar :: head('Chi tiết món đồ')}"></head>
 
 <body>
+    <link rel="stylesheet" th:href="@{/css/exchange.css}">
     <div class="layout">
         <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
         <main class="main-content exchange-page">
             <header class="topbar">
                 <div>
                     <div class="topbar-title">🔄 Chợ trao đổi đồ dùng</div>
-                    <div class="topbar-subtitle">Thông tin chi tiết món đồ</div>
+                    <div class="topbar-subtitle">Thông tin chi tiết món đồ &amp; gửi yêu cầu giao dịch</div>
                 </div>
-                <a th:href="@{/exchange}" class="btn btn-ghost">← Quay lại chợ</a>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <a th:href="@{/exchange/requests/sent}" class="btn btn-ghost btn-sm">📤 Yêu cầu đã gửi</a>
+                    <a th:href="@{/exchange}" class="btn btn-ghost">← Quay lại chợ</a>
+                </div>
             </header>
             <section class="page-content">
+                <!-- Thông báo kết quả gửi yêu cầu -->
+                <div class="alert alert-success" th:if="${success}">
+                    ✅ <span th:text="${success}"></span>
+                </div>
+                <div class="alert alert-error" th:if="${error}">
+                    ❌ <span th:text="${error}"></span>
+                </div>
+
                 <div class="exchange-detail-layout card">
                     <div class="exchange-detail-photo">
                         <img th:if="${item.imagePath != null and !#strings.isEmpty(item.imagePath)}"
@@ -62,6 +74,88 @@
                             <a th:if="${ownerPhone != null and !#strings.isEmpty(ownerPhone)}"
                                 class="btn btn-primary exchange-call-button" th:href="|tel:${ownerPhone}|">☎ Liên hệ chủ
                                 tin</a>
+                        </div>
+
+                        <!-- KHỐI GỬI YÊU CẦU GIAO DỊCH (PHẦN 3) -->
+                        <div class="exchange-contact-card" style="margin-top: 16px;">
+                            <!-- Trường hợp 1: Người xem chính là chủ tin -->
+                            <div th:if="${currentStudent != null and currentStudent.id == item.ownerId}">
+                                <h2>📌 Tin đăng của bạn</h2>
+                                <p>Đây là món đồ do chính bạn đăng. Bạn không thể tự gửi yêu cầu giao dịch cho tin của mình.</p>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+                                    <a th:href="@{/exchange/requests/received(itemId=${item.id})}" class="btn btn-primary btn-sm">
+                                        📥 Xem yêu cầu nhận được
+                                    </a>
+                                    <a th:href="@{/exchange/my-items}" class="btn btn-ghost btn-sm">
+                                        📦 Quản lý tin của tôi
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Trường hợp 2: Sinh viên đã có yêu cầu đang chờ xử lý (PENDING) -->
+                            <div th:if="${(currentStudent == null or currentStudent.id != item.ownerId) and existingRequest != null and existingRequest.status == 'PENDING'}">
+                                <h2>⏳ Yêu cầu đang chờ xử lý</h2>
+                                <p>Bạn đã gửi yêu cầu giao dịch đối với món đồ này. Vui lòng chờ chủ tin phản hồi hoặc liên hệ trực tiếp qua số điện thoại phía trên.</p>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+                                    <a th:href="@{/exchange/requests/sent}" class="btn btn-ghost btn-sm">
+                                        📤 Xem yêu cầu đã gửi
+                                    </a>
+                                    <form th:action="@{/exchange/requests/{id}/cancel(id=${existingRequest.id})}"
+                                          method="post"
+                                          style="display:inline;"
+                                          onsubmit="return confirm('Bạn có chắc chắn muốn hủy yêu cầu giao dịch này không?');">
+                                        <input type="hidden" name="returnUrl" th:value="'/exchange/' + ${item.id}" />
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            ✖ Hủy yêu cầu
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Trường hợp 3: Sinh viên có thể gửi yêu cầu mới -->
+                            <div th:if="${(currentStudent == null or currentStudent.id != item.ownerId) and (existingRequest == null or existingRequest.status == 'CANCELLED' or existingRequest.status == 'REJECTED')}">
+                                <h2>🤝 Gửi yêu cầu giao dịch</h2>
+                                <p style="margin-bottom: 12px;">
+                                    Hình thức giao dịch của tin đăng:
+                                    <strong style="color: var(--accent-green);"
+                                            th:text="${item.exchangeType == 'SELL' ? 'Mua đồ (' + (#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')) + ' đ)' : (item.exchangeType == 'GIVEAWAY' ? 'Nhận đồ miễn phí (0 đ)' : 'Trao đổi đồ')}"></strong>
+                                </p>
+
+                                <form th:action="@{/exchange/{id}/request(id=${item.id})}" method="post">
+                                    <input type="hidden" name="itemId" th:value="${item.id}" />
+                                    <input type="hidden" name="transactionType" th:value="${item.exchangeType}" />
+
+                                    <!-- Nếu tin đăng là EXCHANGE: yêu cầu nhập món đồ đề nghị trao đổi -->
+                                    <div class="form-group" th:if="${item.exchangeType == 'EXCHANGE'}" style="margin-bottom: 14px;">
+                                        <label class="form-label" for="offeredItem">
+                                            Món đồ bạn muốn dùng để trao đổi <span style="color:var(--accent-red)">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="offeredItem"
+                                               name="offeredItem"
+                                               class="form-control"
+                                               maxlength="500"
+                                               required
+                                               th:placeholder="${item.desiredItem != null ? 'VD: ' + item.desiredItem : 'Nhập tên và tình trạng món đồ bạn muốn đổi...'}" />
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 14px;">
+                                        <label class="form-label" for="message">Lời nhắn cho chủ tin</label>
+                                        <textarea id="message"
+                                                  name="message"
+                                                  class="form-control"
+                                                  rows="3"
+                                                  maxlength="2000"
+                                                  placeholder="Nhập lời nhắn, thời gian hoặc tòa/phòng KTX thuận tiện để gặp nhận/trao đổi đồ..."></textarea>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                                        <span th:if="${item.exchangeType == 'SELL'}">🛒 Gửi yêu cầu Mua đồ</span>
+                                        <span th:if="${item.exchangeType == 'GIVEAWAY'}">🎁 Gửi yêu cầu Nhận đồ miễn phí</span>
+                                        <span th:if="${item.exchangeType == 'EXCHANGE'}">🔄 Gửi yêu cầu Trao đổi đồ</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

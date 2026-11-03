@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Yêu cầu đã gửi')}"></head>
+<body>
+<div class="layout">
+    <!-- Sidebar sinh viên -->
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">📤 Yêu cầu giao dịch đã gửi</div>
+                <div class="topbar-subtitle"
+                     th:text="${student != null ? 'Sinh viên: ' + student.fullName + ' (' + student.studentCode + ')' : 'Theo dõi các yêu cầu mua, nhận và trao đổi đồ bạn đã gửi'}">
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a th:href="@{/exchange}" class="btn btn-ghost btn-sm">🔄 Chợ đồ dùng</a>
+                <a th:href="@{/exchange/requests/received}" class="btn btn-ghost btn-sm">📥 Yêu cầu nhận được</a>
+                <a th:href="@{/exchange/history}" class="btn btn-primary btn-sm">🕒 Lịch sử giao dịch</a>
+            </div>
+        </div>
+
+        <div class="page-content">
+            <!-- Thông báo kết quả thao tác -->
+            <div class="alert alert-success" th:if="${success}">
+                ✅ <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                ❌ <span th:text="${error}"></span>
+            </div>
+
+            <!-- Thống kê nhanh -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 24px;">
+                <div class="stat-card blue">
+                    <div class="stat-icon">📤</div>
+                    <div class="stat-value" th:text="${totalCount}">0</div>
+                    <div class="stat-label">Tổng yêu cầu đã gửi</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-value" th:text="${pendingCount}">0</div>
+                    <div class="stat-label">Chờ xử lý (PENDING)</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-icon">🤝</div>
+                    <div class="stat-value" th:text="${acceptedCount}">0</div>
+                    <div class="stat-label">Đã chấp nhận (ACCEPTED)</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" th:text="${completedCount}">0</div>
+                    <div class="stat-label">Đã hoàn thành (COMPLETED)</div>
+                </div>
+            </div>
+
+            <!-- Bộ lọc trạng thái -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body" style="padding: 16px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <span class="text-sm text-muted" style="font-weight:600; margin-right:4px;">Lọc theo trạng thái:</span>
+                        <a th:href="@{/exchange/requests/sent}"
+                           class="btn btn-sm"
+                           th:classappend="${#strings.isEmpty(selectedStatus) ? 'btn-primary' : 'btn-ghost'}">
+                            Tất cả (<span th:text="${totalCount}">0</span>)
+                        </a>
+                        <a th:href="@{/exchange/requests/sent(status='PENDING')}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'PENDING' ? 'btn-primary' : 'btn-ghost'}">
+                            ⏳ Chờ xử lý
+                        </a>
+                        <a th:href="@{/exchange/requests/sent(status='ACCEPTED')}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'ACCEPTED' ? 'btn-primary' : 'btn-ghost'}">
+                            🤝 Đã chấp nhận
+                        </a>
+                        <a th:href="@{/exchange/requests/sent(status='COMPLETED')}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'COMPLETED' ? 'btn-primary' : 'btn-ghost'}">
+                            ✅ Đã hoàn thành
+                        </a>
+                        <a th:href="@{/exchange/requests/sent(status='REJECTED')}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'REJECTED' ? 'btn-primary' : 'btn-ghost'}">
+                            ❌ Đã từ chối
+                        </a>
+                        <a th:href="@{/exchange/requests/sent(status='CANCELLED')}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'CANCELLED' ? 'btn-primary' : 'btn-ghost'}">
+                            🚫 Đã hủy
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách yêu cầu đã gửi -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        📋 Danh sách yêu cầu đã gửi (<span th:text="${requests.size()}">0</span>)
+                    </div>
+                    <div class="text-sm text-muted">
+                        Bạn có thể hủy yêu cầu khi còn đang chờ xử lý hoặc xác nhận hoàn thành khi đã nhận/đổi đồ.
+                    </div>
+                </div>
+
+                <div class="card-body" style="padding: 0;">
+                    <!-- Trạng thái rỗng -->
+                    <div class="empty-state" th:if="${requests.isEmpty()}">
+                        <div class="icon">📭</div>
+                        <h3>Chưa có yêu cầu giao dịch nào</h3>
+                        <p>Bạn chưa gửi yêu cầu giao dịch nào hoặc không có yêu cầu khớp với bộ lọc hiện tại.</p>
+                        <a th:href="@{/exchange}" class="btn btn-primary" style="margin-top: 16px;">
+                            🔎 Khám phá Chợ đồ dùng
+                        </a>
+                    </div>
+
+                    <!-- Bảng dữ liệu -->
+                    <div class="table-wrapper" th:unless="${requests.isEmpty()}" style="border:none; border-radius:0;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 70px;">Ảnh</th>
+                                    <th>Món đồ &amp; Lời nhắn</th>
+                                    <th>Hình thức</th>
+                                    <th>Chủ tin đăng</th>
+                                    <th>Ngày gửi</th>
+                                    <th>Cập nhật</th>
+                                    <th>Trạng thái</th>
+                                    <th style="text-align: right; min-width: 200px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="req : ${requests}">
+                                    <!-- Ảnh món đồ -->
+                                    <td>
+                                        <div style="width: 52px; height: 52px; border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-secondary); display:flex; align-items:center; justify-content:center; border: 1px solid var(--border);">
+                                            <img th:if="${req.itemImagePath != null and !#strings.isEmpty(req.itemImagePath)}"
+                                                 th:src="${req.itemImagePath}"
+                                                 alt="Ảnh món đồ"
+                                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                                            <span th:unless="${req.itemImagePath != null and !#strings.isEmpty(req.itemImagePath)}"
+                                                  style="font-size: 1.4rem;">📦</span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Tên món đồ & nội dung yêu cầu -->
+                                    <td>
+                                        <div class="font-bold" style="font-size:0.95rem;">
+                                            <a th:if="${req.itemViewable}"
+                                               th:href="@{/exchange/{id}(id=${req.itemId})}"
+                                               th:text="${req.itemTitle}">Tên món đồ</a>
+                                            <span th:unless="${req.itemViewable}"
+                                                  style="color:var(--text-primary);"
+                                                  th:text="${req.itemTitle}">Tên món đồ</span>
+                                        </div>
+                                        <div class="text-sm" style="color:var(--accent-purple); margin-top:4px;"
+                                             th:if="${req.offeredItem != null and !#strings.isEmpty(req.offeredItem)}">
+                                            🔄 Đề nghị đổi bằng: <strong th:text="${req.offeredItem}"></strong>
+                                        </div>
+                                        <div class="text-sm text-muted" style="margin-top:2px;"
+                                             th:if="${req.message != null and !#strings.isEmpty(req.message)}"
+                                             th:text="'💬 ' + ${req.message}"></div>
+                                        <div class="text-sm" style="color:var(--accent-red); margin-top:4px;"
+                                             th:if="${req.status == 'REJECTED' and req.rejectReason != null and !#strings.isEmpty(req.rejectReason)}"
+                                             th:text="'Lý do từ chối: ' + ${req.rejectReason}"></div>
+                                    </td>
+
+                                    <!-- Hình thức giao dịch -->
+                                    <td>
+                                        <span class="badge badge-info" th:if="${req.transactionType == 'SELL'}">💰 Mua đồ</span>
+                                        <span class="badge badge-success" th:if="${req.transactionType == 'GIVEAWAY'}">🎁 Nhận miễn phí</span>
+                                        <span class="badge badge-purple" th:if="${req.transactionType == 'EXCHANGE'}">🔄 Trao đổi đồ</span>
+                                        <div class="text-sm" style="margin-top:4px; font-weight:600; color:var(--accent-green);"
+                                             th:if="${req.transactionType == 'SELL' and req.itemPrice != null}"
+                                             th:text="${#numbers.formatDecimal(req.itemPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></div>
+                                    </td>
+
+                                    <!-- Chủ tin -->
+                                    <td>
+                                        <div style="font-weight:600; color:var(--text-primary);" th:text="${req.ownerName}">Chủ tin</div>
+                                        <div class="text-sm text-muted"
+                                             th:if="${req.ownerPhone != null and !#strings.isEmpty(req.ownerPhone)}"
+                                             th:text="'☎ ' + ${req.ownerPhone}"></div>
+                                    </td>
+
+                                    <!-- Ngày gửi -->
+                                    <td>
+                                        <span class="text-sm"
+                                              th:if="${req.createdAt != null}"
+                                              th:text="${#temporals.format(req.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </td>
+
+                                    <!-- Thời điểm cập nhật -->
+                                    <td>
+                                        <span class="text-sm text-muted"
+                                              th:if="${req.updatedAt != null}"
+                                              th:text="${#temporals.format(req.updatedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </td>
+
+                                    <!-- Trạng thái hiện tại -->
+                                    <td>
+                                        <span class="badge badge-warning" th:if="${req.status == 'PENDING'}">⏳ Chờ xử lý</span>
+                                        <span class="badge badge-info" th:if="${req.status == 'ACCEPTED'}">🤝 Đã chấp nhận</span>
+                                        <span class="badge badge-danger" th:if="${req.status == 'REJECTED'}">❌ Đã từ chối</span>
+                                        <span class="badge badge-secondary" th:if="${req.status == 'CANCELLED'}">🚫 Đã hủy</span>
+                                        <span class="badge badge-success" th:if="${req.status == 'COMPLETED'}">✅ Đã hoàn thành</span>
+
+                                        <!-- Trạng thái xác nhận 2 chiều khi đang ACCEPTED -->
+                                        <div class="text-sm text-muted" style="margin-top:6px;" th:if="${req.status == 'ACCEPTED'}">
+                                            <div th:text="${req.requesterConfirmed ? '✓ Bạn đã xác nhận' : '• Bạn chưa xác nhận'}"></div>
+                                            <div th:text="${req.ownerConfirmed ? '✓ Chủ tin đã xác nhận' : '• Chủ tin chưa xác nhận'}"></div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Thao tác -->
+                                    <td style="text-align: right;">
+                                        <div style="display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+                                            <!-- Xem chi tiết tin đăng nếu tin còn AVAILABLE -->
+                                            <a th:if="${req.itemViewable}"
+                                               th:href="@{/exchange/{id}(id=${req.itemId})}"
+                                               class="btn btn-ghost btn-sm"
+                                               title="Xem chi tiết tin đăng">
+                                                👁️ Xem tin
+                                            </a>
+
+                                            <!-- Hủy yêu cầu nếu đang PENDING -->
+                                            <form th:if="${req.canCancel}"
+                                                  th:action="@{/exchange/requests/{id}/cancel(id=${req.id})}"
+                                                  method="post"
+                                                  style="display:inline;"
+                                                  onsubmit="return confirm('Bạn có chắc chắn muốn hủy yêu cầu giao dịch này không?');">
+                                                <input type="hidden" name="returnUrl" value="/exchange/requests/sent" />
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    ✖ Hủy yêu cầu
+                                                </button>
+                                            </form>
+
+                                            <!-- Xác nhận hoàn thành nếu đã ACCEPTED và người gửi chưa xác nhận -->
+                                            <form th:if="${req.canConfirmComplete}"
+                                                  th:action="@{/exchange/requests/{id}/complete(id=${req.id})}"
+                                                  method="post"
+                                                  style="display:inline;"
+                                                  onsubmit="return confirm('Xác nhận bạn đã nhận/trao đổi đồ thực tế với chủ tin?');">
+                                                <input type="hidden" name="returnUrl" value="/exchange/requests/sent" />
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    ✓ Xác nhận hoàn thành
+                                                </button>
+                                            </form>
+
+                                            <span class="text-sm text-muted"
+                                                  th:if="${req.status == 'ACCEPTED' and !req.canConfirmComplete}">
+                                                Đang chờ chủ tin xác nhận
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

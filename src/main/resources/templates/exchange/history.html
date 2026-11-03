@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Lịch sử giao dịch')}"></head>
+<body>
+<div class="layout">
+    <!-- Sidebar sinh viên -->
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">🕒 Lịch sử giao dịch trao đổi đồ</div>
+                <div class="topbar-subtitle"
+                     th:text="${student != null ? 'Sinh viên: ' + student.fullName + ' (' + student.studentCode + ')' : 'Lịch sử các giao dịch đã chấp nhận, hoàn thành, từ chối hoặc đã hủy'}">
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a th:href="@{/exchange}" class="btn btn-ghost btn-sm">🔄 Chợ đồ dùng</a>
+                <a th:href="@{/exchange/requests/sent}" class="btn btn-ghost btn-sm">📤 Yêu cầu đã gửi</a>
+                <a th:href="@{/exchange/requests/received}" class="btn btn-ghost btn-sm">📥 Yêu cầu nhận được</a>
+            </div>
+        </div>
+
+        <div class="page-content">
+            <!-- Thông báo kết quả thao tác -->
+            <div class="alert alert-success" th:if="${success}">
+                ✅ <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                ❌ <span th:text="${error}"></span>
+            </div>
+
+            <!-- Thống kê lịch sử -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 24px;">
+                <div class="stat-card blue">
+                    <div class="stat-icon">🕒</div>
+                    <div class="stat-value" th:text="${totalCount}">0</div>
+                    <div class="stat-label">Tổng giao dịch lịch sử</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" th:text="${completedCount}">0</div>
+                    <div class="stat-label">Đã hoàn thành (COMPLETED)</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-icon">🤝</div>
+                    <div class="stat-value" th:text="${acceptedCount}">0</div>
+                    <div class="stat-label">Đang giao dịch (ACCEPTED)</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-value" th:text="${rejectedCount + cancelledCount}">0</div>
+                    <div class="stat-label">Đã từ chối / Đã hủy</div>
+                </div>
+            </div>
+
+            <!-- Bộ lọc trạng thái & vai trò -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body" style="padding: 16px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <span class="text-sm text-muted" style="font-weight:600; margin-right:4px;">Trạng thái:</span>
+                        <a th:href="@{/exchange/history(role=${selectedRole})}"
+                           class="btn btn-sm"
+                           th:classappend="${#strings.isEmpty(selectedStatus) ? 'btn-primary' : 'btn-ghost'}">
+                            Tất cả
+                        </a>
+                        <a th:href="@{/exchange/history(status='COMPLETED', role=${selectedRole})}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'COMPLETED' ? 'btn-primary' : 'btn-ghost'}">
+                            ✅ Đã hoàn thành
+                        </a>
+                        <a th:href="@{/exchange/history(status='ACCEPTED', role=${selectedRole})}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'ACCEPTED' ? 'btn-primary' : 'btn-ghost'}">
+                            🤝 Đã chấp nhận
+                        </a>
+                        <a th:href="@{/exchange/history(status='REJECTED', role=${selectedRole})}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'REJECTED' ? 'btn-primary' : 'btn-ghost'}">
+                            ❌ Đã từ chối
+                        </a>
+                        <a th:href="@{/exchange/history(status='CANCELLED', role=${selectedRole})}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedStatus == 'CANCELLED' ? 'btn-primary' : 'btn-ghost'}">
+                            🚫 Đã hủy
+                        </a>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <span class="text-sm text-muted" style="font-weight:600;">Vai trò:</span>
+                        <a th:href="@{/exchange/history(status=${selectedStatus})}"
+                           class="btn btn-sm"
+                           th:classappend="${#strings.isEmpty(selectedRole) ? 'btn-primary' : 'btn-ghost'}">
+                            Tất cả
+                        </a>
+                        <a th:href="@{/exchange/history(status=${selectedStatus}, role='OWNER')}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedRole == 'OWNER' ? 'btn-primary' : 'btn-ghost'}">
+                            📦 Chủ tin đăng
+                        </a>
+                        <a th:href="@{/exchange/history(status=${selectedStatus}, role='REQUESTER')}"
+                           class="btn btn-sm"
+                           th:classappend="${selectedRole == 'REQUESTER' ? 'btn-primary' : 'btn-ghost'}">
+                            📤 Người gửi yêu cầu
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng lịch sử giao dịch -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        📋 Danh sách giao dịch đã tham gia (<span th:text="${historyPage.totalElements}">0</span>)
+                    </div>
+                    <div class="text-sm text-muted">
+                        Giao dịch chuyển sang Đã hoàn thành khi cả Chủ tin đăng và Người gửi yêu cầu cùng xác nhận.
+                    </div>
+                </div>
+
+                <div class="card-body" style="padding: 0;">
+                    <!-- Trạng thái rỗng -->
+                    <div class="empty-state" th:if="${historyList.isEmpty()}">
+                        <div class="icon">🕒</div>
+                        <h3>Chưa có lịch sử giao dịch</h3>
+                        <p>Các yêu cầu sau khi được chấp nhận, hoàn thành, từ chối hoặc hủy sẽ được lưu lại tại đây.</p>
+                        <a th:href="@{/exchange}" class="btn btn-primary" style="margin-top: 16px;">
+                            🔄 Đến Chợ trao đổi đồ
+                        </a>
+                    </div>
+
+                    <!-- Bảng dữ liệu -->
+                    <div class="table-wrapper" th:unless="${historyList.isEmpty()}" style="border:none; border-radius:0;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 70px;">Ảnh</th>
+                                    <th>Tên món đồ</th>
+                                    <th>Vai trò của bạn</th>
+                                    <th>Hình thức</th>
+                                    <th>Người tham gia còn lại</th>
+                                    <th>Thời điểm gửi</th>
+                                    <th>Thời điểm xử lý</th>
+                                    <th>Thời điểm hoàn thành</th>
+                                    <th>Trạng thái</th>
+                                    <th style="text-align: right; min-width: 170px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="tx : ${historyList}">
+                                    <!-- Ảnh -->
+                                    <td>
+                                        <div style="width: 50px; height: 50px; border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-secondary); display:flex; align-items:center; justify-content:center; border: 1px solid var(--border);">
+                                            <img th:if="${tx.itemImagePath != null and !#strings.isEmpty(tx.itemImagePath)}"
+                                                 th:src="${tx.itemImagePath}"
+                                                 alt="Ảnh món đồ"
+                                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                                            <span th:unless="${tx.itemImagePath != null and !#strings.isEmpty(tx.itemImagePath)}"
+                                                  style="font-size: 1.3rem;">📦</span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Tên món đồ -->
+                                    <td>
+                                        <div class="font-bold" style="color:var(--text-primary); font-size:0.95rem;"
+                                             th:text="${tx.itemTitle}">Tên món đồ</div>
+                                        <div class="text-sm" style="color:var(--accent-purple); margin-top:2px;"
+                                             th:if="${tx.offeredItem != null and !#strings.isEmpty(tx.offeredItem)}">
+                                            🔄 Đổi bằng: <span th:text="${tx.offeredItem}"></span>
+                                        </div>
+                                        <div class="text-sm" style="color:var(--accent-red); margin-top:2px;"
+                                             th:if="${tx.status == 'REJECTED' and tx.rejectReason != null and !#strings.isEmpty(tx.rejectReason)}"
+                                             th:text="'Lý do: ' + ${tx.rejectReason}"></div>
+                                    </td>
+
+                                    <!-- Vai trò -->
+                                    <td>
+                                        <span class="badge badge-purple" th:if="${tx.currentUserIsOwner}">📦 Chủ tin đăng</span>
+                                        <span class="badge badge-info" th:if="${tx.currentUserIsRequester}">📤 Người gửi yêu cầu</span>
+                                    </td>
+
+                                    <!-- Hình thức -->
+                                    <td>
+                                        <span class="badge badge-info" th:if="${tx.transactionType == 'SELL'}">💰 Mua đồ</span>
+                                        <span class="badge badge-success" th:if="${tx.transactionType == 'GIVEAWAY'}">🎁 Nhận miễn phí</span>
+                                        <span class="badge badge-purple" th:if="${tx.transactionType == 'EXCHANGE'}">🔄 Trao đổi đồ</span>
+                                    </td>
+
+                                    <!-- Người tham gia còn lại -->
+                                    <td>
+                                        <div style="font-weight:600; color:var(--text-primary);" th:text="${tx.counterpartyName}">Sinh viên</div>
+                                        <div class="text-sm text-muted"
+                                             th:if="${tx.counterpartyStudentCode != null}"
+                                             th:text="'MSSV: ' + ${tx.counterpartyStudentCode}"></div>
+                                        <div class="text-sm" style="color:var(--accent-green);"
+                                             th:if="${(tx.status == 'ACCEPTED' or tx.status == 'COMPLETED') and tx.counterpartyPhone != null and !#strings.isEmpty(tx.counterpartyPhone)}"
+                                             th:text="'☎ ' + ${tx.counterpartyPhone}"></div>
+                                    </td>
+
+                                    <!-- Thời điểm gửi -->
+                                    <td>
+                                        <span class="text-sm"
+                                              th:if="${tx.createdAt != null}"
+                                              th:text="${#temporals.format(tx.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </td>
+
+                                    <!-- Thời điểm xử lý -->
+                                    <td>
+                                        <span class="text-sm"
+                                              th:if="${tx.processedAt != null}"
+                                              th:text="${#temporals.format(tx.processedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                        <span class="text-sm text-muted" th:unless="${tx.processedAt != null}">—</span>
+                                    </td>
+
+                                    <!-- Thời điểm hoàn thành -->
+                                    <td>
+                                        <span class="text-sm" style="color:var(--accent-green); font-weight:600;"
+                                              th:if="${tx.completedAt != null}"
+                                              th:text="${#temporals.format(tx.completedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                        <span class="text-sm text-muted" th:unless="${tx.completedAt != null}">—</span>
+                                    </td>
+
+                                    <!-- Trạng thái -->
+                                    <td>
+                                        <span class="badge badge-info" th:if="${tx.status == 'ACCEPTED'}">🤝 Đã chấp nhận</span>
+                                        <span class="badge badge-danger" th:if="${tx.status == 'REJECTED'}">❌ Đã từ chối</span>
+                                        <span class="badge badge-secondary" th:if="${tx.status == 'CANCELLED'}">🚫 Đã hủy</span>
+                                        <span class="badge badge-success" th:if="${tx.status == 'COMPLETED'}">✅ Đã hoàn thành</span>
+
+                                        <div class="text-sm text-muted" style="margin-top:6px;" th:if="${tx.status == 'ACCEPTED'}">
+                                            <div th:text="${tx.ownerConfirmed ? '✓ Chủ tin đã xác nhận' : '• Chủ tin chưa xác nhận'}"></div>
+                                            <div th:text="${tx.requesterConfirmed ? '✓ Người nhận đã xác nhận' : '• Người nhận chưa xác nhận'}"></div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Thao tác -->
+                                    <td style="text-align: right;">
+                                        <form th:if="${tx.canConfirmComplete}"
+                                              th:action="@{/exchange/requests/{id}/complete(id=${tx.id})}"
+                                              method="post"
+                                              style="display:inline;"
+                                              onsubmit="return confirm('Xác nhận bạn đã hoàn tất giao dịch thực tế?');">
+                                            <input type="hidden" name="returnUrl" value="/exchange/history" />
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                ✓ Xác nhận hoàn thành
+                                            </button>
+                                        </form>
+                                        <span class="text-sm text-muted"
+                                              th:if="${tx.status == 'ACCEPTED' and !tx.canConfirmComplete}">
+                                            Chờ bên kia xác nhận
+                                        </span>
+                                        <span class="text-sm text-muted"
+                                              th:if="${tx.status != 'ACCEPTED'}">
+                                            Đã đóng
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Phân trang lịch sử -->
+                    <div style="display:flex; justify-content:center; gap:8px; padding:20px;"
+                         th:if="${historyPage.totalPages > 1}">
+                        <a th:if="${historyPage.hasPrevious()}"
+                           th:href="@{/exchange/history(status=${selectedStatus}, role=${selectedRole}, page=${historyPage.number - 1})}"
+                           class="btn btn-ghost btn-sm">
+                            ← Trước
+                        </a>
+                        <span th:each="p : ${#numbers.sequence(0, historyPage.totalPages - 1)}">
+                            <a th:href="@{/exchange/history(status=${selectedStatus}, role=${selectedRole}, page=${p})}"
+                               th:text="${p + 1}"
+                               class="btn btn-sm"
+                               th:classappend="${p == historyPage.number ? 'btn-primary' : 'btn-ghost'}">1</a>
+                        </span>
+                        <a th:if="${historyPage.hasNext()}"
+                           th:href="@{/exchange/history(status=${selectedStatus}, role=${selectedRole}, page=${historyPage.number + 1})}"
+                           class="btn btn-ghost btn-sm">
+                            Sau →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
