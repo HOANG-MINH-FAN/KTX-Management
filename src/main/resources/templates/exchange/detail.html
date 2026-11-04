@@ -16,6 +16,7 @@
                 <div style="display:flex; gap:10px; align-items:center;">
                     <a th:href="@{/exchange/requests/sent}" class="btn btn-ghost btn-sm">📤 Yêu cầu đã gửi</a>
                     <a th:href="@{/exchange}" class="btn btn-ghost">← Quay lại chợ</a>
+                    <div th:replace="~{exchange/fragments/item-actions :: actions(${item.id})}"></div>
                 </div>
             </header>
             <section class="page-content">
@@ -74,6 +75,8 @@
                             <a th:if="${ownerPhone != null and !#strings.isEmpty(ownerPhone)}"
                                 class="btn btn-primary exchange-call-button" th:href="|tel:${ownerPhone}|">☎ Liên hệ chủ
                                 tin</a>
+                            <div th:replace="~{exchange/fragments/owner-reputation :: reputation(${item.ownerId}, ${ownerReputation})}"></div>
+
                         </div>
 
                         <!-- KHỐI GỬI YÊU CẦU GIAO DỊCH (PHẦN 3) -->

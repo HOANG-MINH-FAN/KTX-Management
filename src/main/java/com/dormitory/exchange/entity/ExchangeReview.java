@@ -33,5 +33,61 @@ public class ExchangeReview {
         createdAt = LocalDateTime.now();
     }
 
-    // Getter + Setter
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(Long requestId) {
+        this.requestId = requestId;
+    }
+
+    public Long getReviewerId() {
+        return reviewerId;
+    }
+
+    public void setReviewerId(Long reviewerId) {
+        this.reviewerId = reviewerId;
+    }
+
+    public Long getRevieweeId() {
+        return revieweeId;
+    }
+
+    public void setRevieweeId(Long revieweeId) {
+        this.revieweeId = revieweeId;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+  
 }

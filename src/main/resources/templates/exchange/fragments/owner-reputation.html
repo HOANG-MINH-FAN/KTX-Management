@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="reputation(ownerId, rep)"
+     style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+    <p th:if="${rep != null}" style="margin:0 0 4px;">
+        <span th:text="${rep.starsText}" style="color:#f5b301; letter-spacing:2px;"></span>
+        <strong th:text="${rep.averageRating != null ? #numbers.formatDecimal(rep.averageRating,1,'COMMA',1,'POINT') : 'Chưa có đánh giá'}"></strong>
+        <span class="text-sm text-muted" th:if="${rep.reviewCount > 0}"
+              th:text="'(' + ${rep.reviewCount} + ' đánh giá)'"></span>
+    </p>
+    <p th:if="${rep != null}" class="text-sm" style="margin:0 0 8px;">
+        🤝 <strong th:text="${rep.completedCount}">0</strong> giao dịch hoàn thành
+    </p>
+    <a th:href="@{/exchange/users/{id}(id=${ownerId})}" class="btn btn-ghost btn-sm">👤 Xem hồ sơ</a>
+</div>
+</body>
+</html>

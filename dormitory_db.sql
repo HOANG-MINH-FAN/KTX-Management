@@ -368,6 +368,13 @@ CREATE TABLE exchange_requests (
     message         TEXT            NULL,
     status          VARCHAR(20)     NOT NULL DEFAULT 'PENDING'
                                     COMMENT 'PENDING | ACCEPTED | REJECTED | CANCELLED | COMPLETED',
+    transaction_type    VARCHAR(20)  NULL,
+	offered_item        VARCHAR(500) NULL,
+	reject_reason       VARCHAR(500) NULL,
+	owner_confirmed     BOOLEAN      NOT NULL DEFAULT FALSE,
+	requester_confirmed BOOLEAN      NOT NULL DEFAULT FALSE,
+	processed_at        TIMESTAMP    NULL,
+	completed_at        TIMESTAMP    NULL,                                
     created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
                                     ON UPDATE CURRENT_TIMESTAMP,
@@ -454,13 +461,3 @@ INSERT INTO rooms (building_id, room_number, floor, capacity, occupied, room_typ
 (3, '201', 2, 2, 0, 'MIXED', 1500000, 'AVAILABLE'),
 (3, '202', 2, 2, 0, 'MIXED', 1500000, 'MAINTENANCE');
 
--- =============================================================
--- CHỐT SCHEMA:
--- 14 bảng đã bao phủ chức năng 1-11.
--- Từ thời điểm này, không tự ý thay đổi cấu trúc database.
--- Nếu phát sinh nhu cầu mới, cả nhóm phải thống nhất trước.
--- =============================================================
--- Ghi chú: Tài khoản người dùng (users) và dữ liệu nghiệp vụ
--- mẫu (hợp đồng, hóa đơn, vi phạm) sẽ được tạo tự động bởi
--- DataInitializer.java khi khởi động ứng dụng lần đầu.
--- =============================================================

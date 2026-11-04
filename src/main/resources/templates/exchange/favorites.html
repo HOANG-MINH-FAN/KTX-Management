@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Tin đã lưu')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-title">❤️ Tin đã lưu</div>
+            <a th:href="@{/exchange}" class="btn btn-ghost btn-sm">🔄 Về chợ đồ</a>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+            <div class="card">
+                <div class="card-body" style="padding:0;">
+                    <div class="empty-state" th:if="${items.isEmpty()}">
+                        <div class="icon">🤍</div>
+                        <h3>Bạn chưa lưu tin nào</h3>
+                        <p>Vào chợ đồ và bấm "Lưu tin" để xem lại sau.</p>
+                    </div>
+                    <div class="table-wrapper" th:unless="${items.isEmpty()}">
+                        <table>
+                            <thead>
+                            <tr><th>Tên đồ</th><th>Hình thức</th><th>Giá</th><th>Trạng thái</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${items}">
+                                <td th:text="${item.title}"></td>
+                                <td th:text="${item.exchangeType}"></td>
+                                <td th:text="${item.price != null ? #numbers.formatDecimal(item.price,0,'COMMA',0,'POINT') + ' đ' : 'Miễn phí'}"></td>
+                                <td><span class="badge badge-info" th:text="${item.status}"></span></td>
+                                <td>
+                                    <a th:href="@{/exchange/{id}(id=${item.id})}" class="btn btn-ghost btn-sm">Xem</a>
+                                    <form th:action="@{/exchange/favorites/{id}/toggle(id=${item.id})}"
+                                          method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">Bỏ lưu</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

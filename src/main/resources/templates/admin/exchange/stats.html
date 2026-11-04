@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Thống kê trao đổi đồ')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar"><div class="topbar-title">📈 Thống kê Trao đổi đồ</div></div>
+        <div class="page-content">
+            <div class="stats-grid">
+                <div class="stat-card blue"><div class="stat-icon">📦</div>
+                    <div class="stat-value" th:text="${total}">0</div><div class="stat-label">Tổng tin đăng</div></div>
+                <div class="stat-card green"><div class="stat-icon">🟢</div>
+                    <div class="stat-value" th:text="${active}">0</div><div class="stat-label">Tin đang hoạt động</div></div>
+                <div class="stat-card purple"><div class="stat-icon">🤝</div>
+                    <div class="stat-value" th:text="${completed}">0</div><div class="stat-label">Giao dịch hoàn thành</div></div>
+                <div class="stat-card orange"><div class="stat-icon">♻️</div>
+                    <div class="stat-value" th:text="${reused}">0</div><div class="stat-label">Đồ được tái sử dụng</div></div>
+                <div class="stat-card red"><div class="stat-icon">🚩</div>
+                    <div class="stat-value" th:text="${pendingReports}">0</div><div class="stat-label">Báo cáo chờ xử lý</div></div>
+            </div>
+            <div class="card" style="margin-top:24px;">
+                <div class="card-header"><span class="card-title">Cách tính</span></div>
+                <div class="card-body">
+                    <p>• <b>Tổng tin đăng:</b> số dòng trong bảng exchange_items.</p>
+                    <p>• <b>Đang hoạt động:</b> tin có trạng thái AVAILABLE.</p>
+                    <p>• <b>Giao dịch hoàn thành:</b> yêu cầu có trạng thái COMPLETED.</p>
+                    <p>• <b>Đồ được tái sử dụng:</b> tin có trạng thái SOLD hoặc EXCHANGED.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Báo cáo tin đăng')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-title">🚩 Báo cáo tin đăng</div>
+        </div>
+        <div class="page-content">
+            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" th:text="'Tin: ' + ${item.title}"></span>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/exchange/reports}" method="post">
+                        <input type="hidden" name="itemId" th:value="${item.id}">
+                        <div class="form-group">
+                            <label class="form-label">Lý do *</label>
+                            <select class="form-control" name="reason" required>
+                                <option value="">-- Chọn lý do --</option>
+                                <option th:each="r : ${reasons}" th:value="${r}" th:text="${r}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mô tả thêm</label>
+                            <textarea class="form-control" name="description" rows="4"
+                                      placeholder="Mô tả vấn đề bạn gặp..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">🚩 Gửi báo cáo</button>
+                        <a th:href="@{/exchange}" class="btn btn-ghost">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

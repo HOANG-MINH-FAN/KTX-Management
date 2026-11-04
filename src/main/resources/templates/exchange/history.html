@@ -250,6 +250,9 @@
                                               th:if="${tx.status == 'ACCEPTED' and !tx.canConfirmComplete}">
                                             Chờ bên kia xác nhận
                                         </span>
+                                        <a th:if="${tx.status == 'COMPLETED'}"
+                                           th:href="@{/exchange/reviews(requestId=${tx.id})}"
+                                           class="btn btn-ghost btn-sm">⭐ Đánh giá</a>
                                         <span class="text-sm text-muted"
                                               th:if="${tx.status != 'ACCEPTED'}">
                                             Đã đóng

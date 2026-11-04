@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Hồ sơ người đăng')}"></head>
+<body>
+<div class="layout">
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">👤 Hồ sơ người đăng</div>
+                <div class="topbar-subtitle" th:text="${profileUser.fullName}">Tên</div>
+            </div>
+            <a th:href="@{/exchange}" class="btn btn-ghost btn-sm">🔄 Về chợ đồ</a>
+        </div>
+        <div class="page-content">
+
+            <!-- Thông tin liên hệ -->
+            <div class="card">
+                <div class="card-body">
+                    <h2 style="margin:0 0 8px;" th:text="${profileUser.fullName}">Họ tên</h2>
+                    <p th:if="${profileUser.phone != null and !#strings.isEmpty(profileUser.phone)}">
+                        ☎ Số điện thoại: <strong th:text="${profileUser.phone}">0000000000</strong>
+                    </p>
+                    <p th:unless="${profileUser.phone != null and !#strings.isEmpty(profileUser.phone)}"
+                       class="text-sm text-muted">Chưa cập nhật số điện thoại trong hồ sơ.</p>
+                    <a th:if="${profileUser.phone != null and !#strings.isEmpty(profileUser.phone)}"
+                       th:href="|tel:${profileUser.phone}|" class="btn btn-primary btn-sm">☎ Liên hệ</a>
+                </div>
+            </div>
+
+            <!-- Uy tín -->
+            <div class="stats-grid" style="margin-top:24px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="stat-card yellow">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value"
+                         th:text="${reputation.averageRating != null ? #numbers.formatDecimal(reputation.averageRating,1,'COMMA',1,'POINT') : '—'}">—</div>
+                    <div class="stat-label">Điểm trung bình
+                        <span th:text="${reputation.starsText}" style="color:#f5b301; letter-spacing:2px;"></span></div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-value" th:text="${reputation.reviewCount}">0</div>
+                    <div class="stat-label">Lượt đánh giá nhận được</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon">🤝</div>
+                    <div class="stat-value" th:text="${reputation.completedCount}">0</div>
+                    <div class="stat-label">Giao dịch hoàn thành</div>
+                </div>
+            </div>
+            <p class="text-sm text-muted" style="margin-top:8px;">
+                Giao dịch hoàn thành tính cả khi người này là chủ tin và khi là người gửi yêu cầu.
+            </p>
+
+            <!-- Đánh giá nhận được -->
+            <div class="card" style="margin-top:24px;">
+                <div class="card-header"><span class="card-title">📥 Đánh giá nhận được</span></div>
+                <div class="card-body" style="padding:0;">
+                    <div class="empty-state" th:if="${reviews.isEmpty()}"><h3>Chưa có đánh giá nào</h3></div>
+                    <div class="table-wrapper" th:unless="${reviews.isEmpty()}">
+                        <table>
+                            <thead><tr><th>Từ</th><th>Điểm</th><th>Nhận xét</th><th>Ngày</th></tr></thead>
+                            <tbody>
+                            <tr th:each="r : ${reviews}">
+                                <td th:text="${names[r.reviewerId]}"></td>
+                                <td th:text="${r.rating} + ' ⭐'"></td>
+                                <td th:text="${r.comment}"></td>
+                                <td th:text="${#temporals.format(r.createdAt,'dd/MM/yyyy')}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tin đang đăng -->
+            <div class="card" style="margin-top:24px;">
+                <div class="card-header">
+                    <span class="card-title" th:text="'📦 Tin đang đăng (' + ${activeItems.size()} + ')'"></span>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <div class="empty-state" th:if="${activeItems.isEmpty()}"><h3>Hiện không có tin nào đang đăng</h3></div>
+                    <div class="table-wrapper" th:unless="${activeItems.isEmpty()}">
+                        <table>
+                            <thead><tr><th>Tên đồ</th><th>Hình thức</th><th>Giá</th><th></th></tr></thead>
+                            <tbody>
+                            <tr th:each="i : ${activeItems}">
+                                <td th:text="${i.title}"></td>
+                                <td th:text="${i.exchangeType == 'SELL' ? 'Bán' : (i.exchangeType == 'GIVEAWAY' ? 'Cho tặng' : 'Trao đổi')}"></td>
+                                <td th:text="${i.exchangeType == 'SELL' and i.price != null ? #numbers.formatDecimal(i.price,0,'COMMA',0,'POINT') + ' đ' : (i.exchangeType == 'GIVEAWAY' ? 'Miễn phí' : '—')}"></td>
+                                <td><a th:href="@{/exchange/{id}(id=${i.id})}" class="btn btn-ghost btn-sm">Xem</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

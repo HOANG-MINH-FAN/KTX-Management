@@ -18,4 +18,10 @@ public interface ExchangeReviewService {
     ExchangeReview save(ExchangeReview review);
 
     void delete(Long id);
+
+    /** Người đánh giá tạo đánh giá cho giao dịch đã hoàn thành. Vi phạm luật thì ném IllegalArgumentException. */
+    ExchangeReview createReview(Long reviewerId, Long requestId, int rating, String comment);
+
+    /** Điểm trung bình người này nhận được; null nếu chưa có đánh giá. */
+    Double getAverageRating(Long userId);
 }
