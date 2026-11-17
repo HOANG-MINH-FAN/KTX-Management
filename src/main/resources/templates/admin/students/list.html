@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Quản lý Sinh viên')}"></head>
 <body>
 <div class="layout">
@@ -7,26 +7,36 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">👤 Quản lý Sinh viên</div>
+                <div class="topbar-title"><i class="bi bi-people"></i> Quản lý Sinh viên</div>
                 <div class="topbar-subtitle" th:text="'Tổng cộng: ' + ${#lists.size(students)} + ' sinh viên'"></div>
             </div>
-            <a class="btn btn-primary" th:href="@{/admin/students/new}">➕ Thêm sinh viên</a>
+            <div class="topbar-right">
+                <a class="btn btn-primary" th:href="@{/admin/students/new}">
+                    <i class="bi bi-person-plus"></i> Thêm sinh viên
+                </a>
+            </div>
         </div>
         <div class="page-content">
-            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
-
-            <div class="card mb-6">
-                <div class="card-body">
-                    <form th:action="@{/admin/students}" method="get" style="display:flex; gap:12px; align-items:center;">
-                        <input type="text" name="keyword" class="form-control" placeholder="Tìm theo mã, tên, username..." th:value="${keyword}" style="flex:1;">
-                        <button type="submit" class="btn btn-primary">🔍 Tìm kiếm</button>
-                        <a th:href="@{/admin/students}" class="btn btn-ghost" th:if="${keyword != null and keyword != ''}">❌ Xóa lọc</a>
-                    </form>
-                </div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
             </div>
 
             <div class="card">
+                <div class="card-header">
+                    <form th:action="@{/admin/students}" method="get" class="filter-bar" style="width: 100%;">
+                        <input type="text" name="keyword" class="form-control" placeholder="Tìm theo mã sinh viên, họ tên, tài khoản..." th:value="${keyword}" style="flex: 1; min-width: 220px;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                        <a th:href="@{/admin/students}" class="btn btn-ghost" th:if="${keyword != null and keyword != ''}">
+                            <i class="bi bi-x-lg"></i> Xóa lọc
+                        </a>
+                    </form>
+                </div>
+
                 <div class="table-wrapper">
                     <table>
                         <thead>
@@ -46,7 +56,7 @@
                                 <td class="text-muted" th:text="${iter.count}"></td>
                                 <td><span class="badge badge-info" th:text="${s.studentCode}"></span></td>
                                 <td class="font-bold" th:text="${s.fullName}"></td>
-                                <td class="text-muted" th:text="${s.username}"></td>
+                                <td class="text-secondary" th:text="${s.username}"></td>
                                 <td th:text="${s.faculty ?: '—'}"></td>
                                 <td th:text="${s.phone ?: '—'}"></td>
                                 <td>
@@ -55,12 +65,18 @@
                                     <span th:if="${s.gender == null}"     class="text-muted">—</span>
                                 </td>
                                 <td>
-                                    <div style="display:flex; gap:6px;">
-                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/students/detail/{id}(id=${s.id})}" title="Xem chi tiết">👁️</a>
-                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/students/edit/{id}(id=${s.id})}" title="Chỉnh sửa">✏️</a>
+                                    <div class="flex gap-2">
+                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/students/detail/{id}(id=${s.id})}" title="Xem chi tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/students/edit/{id}(id=${s.id})}" title="Chỉnh sửa">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
                                         <form th:action="@{/admin/students/delete/{id}(id=${s.id})}" method="post"
                                               onsubmit="return confirm('Xóa sinh viên này?')">
-                                            <button class="btn btn-sm btn-danger" type="submit" title="Xóa">🗑️</button>
+                                            <button class="btn btn-sm btn-danger" type="submit" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
@@ -68,9 +84,9 @@
                             <tr th:if="${#lists.isEmpty(students)}">
                                 <td colspan="8">
                                     <div class="empty-state">
-                                        <div class="icon">👤</div>
+                                        <div class="icon"><i class="bi bi-people"></i></div>
                                         <h3>Chưa có sinh viên nào</h3>
-                                        <p>Thêm sinh viên mới để bắt đầu.</p>
+                                        <p>Thêm hồ sơ sinh viên mới để bắt đầu quản lý lưu trú.</p>
                                     </div>
                                 </td>
                             </tr>

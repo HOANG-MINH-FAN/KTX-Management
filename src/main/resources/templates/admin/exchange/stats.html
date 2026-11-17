@@ -1,31 +1,68 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Thống kê trao đổi đồ')}"></head>
 <body>
 <div class="layout">
     <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
     <div class="main-content">
-        <div class="topbar"><div class="topbar-title">📈 Thống kê Trao đổi đồ</div></div>
+        <div class="topbar">
+            <div>
+                <div class="topbar-title"><i class="bi bi-bar-chart-line"></i> Thống kê Trao đổi đồ</div>
+                <div class="topbar-subtitle">Số liệu tổng hợp hoạt động trao đổi đồ dùng sinh viên</div>
+            </div>
+        </div>
         <div class="page-content">
             <div class="stats-grid">
-                <div class="stat-card blue"><div class="stat-icon">📦</div>
-                    <div class="stat-value" th:text="${total}">0</div><div class="stat-label">Tổng tin đăng</div></div>
-                <div class="stat-card green"><div class="stat-icon">🟢</div>
-                    <div class="stat-value" th:text="${active}">0</div><div class="stat-label">Tin đang hoạt động</div></div>
-                <div class="stat-card purple"><div class="stat-icon">🤝</div>
-                    <div class="stat-value" th:text="${completed}">0</div><div class="stat-label">Giao dịch hoàn thành</div></div>
-                <div class="stat-card orange"><div class="stat-icon">♻️</div>
-                    <div class="stat-value" th:text="${reused}">0</div><div class="stat-label">Đồ được tái sử dụng</div></div>
-                <div class="stat-card red"><div class="stat-icon">🚩</div>
-                    <div class="stat-value" th:text="${pendingReports}">0</div><div class="stat-label">Báo cáo chờ xử lý</div></div>
+                <div class="stat-card blue">
+                    <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+                    <div class="stat-value" th:text="${total}">0</div>
+                    <div class="stat-label">Tổng tin đăng</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                    <div class="stat-value" th:text="${active}">0</div>
+                    <div class="stat-label">Tin đang hoạt động</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-icon"><i class="bi bi-arrow-left-right"></i></div>
+                    <div class="stat-value" th:text="${completed}">0</div>
+                    <div class="stat-label">Giao dịch hoàn thành</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-icon"><i class="bi bi-recycle"></i></div>
+                    <div class="stat-value" th:text="${reused}">0</div>
+                    <div class="stat-label">Đồ được tái sử dụng</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-icon"><i class="bi bi-flag"></i></div>
+                    <div class="stat-value" th:text="${pendingReports}">0</div>
+                    <div class="stat-label">Báo cáo chờ xử lý</div>
+                </div>
             </div>
-            <div class="card" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title">Cách tính</span></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="bi bi-info-circle"></i> Ghi chú chỉ số</span>
+                </div>
                 <div class="card-body">
-                    <p>• <b>Tổng tin đăng:</b> số dòng trong bảng exchange_items.</p>
-                    <p>• <b>Đang hoạt động:</b> tin có trạng thái AVAILABLE.</p>
-                    <p>• <b>Giao dịch hoàn thành:</b> yêu cầu có trạng thái COMPLETED.</p>
-                    <p>• <b>Đồ được tái sử dụng:</b> tin có trạng thái SOLD hoặc EXCHANGED.</p>
+                    <div class="detail-list">
+                        <div class="detail-row">
+                            <span class="detail-label">Tổng tin đăng</span>
+                            <span class="text-secondary text-sm">Tổng số bản ghi trong bảng <code>exchange_items</code>.</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tin đang hoạt động</span>
+                            <span class="text-secondary text-sm">Các tin đang mở công khai với trạng thái <code>AVAILABLE</code>.</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Giao dịch hoàn thành</span>
+                            <span class="text-secondary text-sm">Các yêu cầu giao dịch được cả 2 bên xác nhận <code>COMPLETED</code>.</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Đồ được tái sử dụng</span>
+                            <span class="text-secondary text-sm">Các món đồ đã chuyển sang trạng thái <code>SOLD</code> hoặc <code>EXCHANGED</code>.</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

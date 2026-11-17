@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Dashboard Sinh viên')}"></head>
 <body>
 <div class="layout">
@@ -7,73 +7,81 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">🏠 Dashboard Sinh viên</div>
+                <div class="topbar-title"><i class="bi bi-house-door"></i> Trang chủ Sinh viên</div>
                 <div class="topbar-subtitle" th:text="'Xin chào, ' + ${student?.fullName}"></div>
             </div>
         </div>
         <div class="page-content">
 
             <!-- Alerts -->
-            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-            <div class="alert alert-warning" th:if="${warning}" th:text="${warning}"></div>
-            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-warning" th:if="${warning}">
+                <i class="bi bi-exclamation-triangle"></i> <span th:text="${warning}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
 
             <!-- Thông tin cá nhân -->
-            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="stats-grid">
                 <div class="stat-card blue">
-                    <div class="stat-icon">🎓</div>
-                    <div class="stat-value" style="font-size:1.1rem;" th:text="${student?.studentCode}">—</div>
+                    <div class="stat-icon"><i class="bi bi-mortarboard"></i></div>
+                    <div class="stat-value" style="font-size: 1.25rem;" th:text="${student?.studentCode}">—</div>
                     <div class="stat-label">Mã sinh viên</div>
                 </div>
                 <div class="stat-card green">
-                    <div class="stat-icon">🏠</div>
-                    <div class="stat-value" style="font-size:1rem;"
+                    <div class="stat-icon"><i class="bi bi-door-open"></i></div>
+                    <div class="stat-value" style="font-size: 1.15rem;"
                          th:text="${activeContract != null} ? ${activeContract.room?.building?.name} + ' - ' + ${activeContract.room?.roomNumber} : 'Chưa có'">—</div>
                     <div class="stat-label">Phòng hiện tại</div>
                 </div>
                 <div class="stat-card yellow">
-                    <div class="stat-icon">💰</div>
-                    <div class="stat-value" style="font-size:1.3rem;"
+                    <div class="stat-icon"><i class="bi bi-receipt"></i></div>
+                    <div class="stat-value" style="font-size: 1.35rem;"
                          th:text="${#lists.size(recentInvoices)}">0</div>
-                    <div class="stat-label">Hóa đơn</div>
+                    <div class="stat-label">Hóa đơn gần đây</div>
                 </div>
                 <div class="stat-card red">
-                    <div class="stat-icon">⚠️</div>
-                    <div class="stat-value" style="font-size:1.3rem;"
+                    <div class="stat-icon"><i class="bi bi-shield-exclamation"></i></div>
+                    <div class="stat-value" style="font-size: 1.35rem;"
                          th:text="${#lists.size(violations)}">0</div>
-                    <div class="stat-label">Vi phạm</div>
+                    <div class="stat-label">Vi phạm nội quy</div>
                 </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="detail-grid">
                 <!-- Hợp đồng -->
                 <div class="card">
-                    <div class="card-header"><span class="card-title">📄 Hợp đồng hiện tại</span></div>
+                    <div class="card-header">
+                        <span class="card-title"><i class="bi bi-file-earmark-text"></i> Hợp đồng hiện tại</span>
+                    </div>
                     <div class="card-body">
-                        <div th:if="${activeContract != null}">
-                            <div class="flex-between mb-4">
-                                <span class="text-muted text-sm">Phòng</span>
-                                <span class="font-bold" th:text="${activeContract.room?.building?.name + ' - ' + activeContract.room?.roomNumber}"></span>
+                        <div class="detail-list" th:if="${activeContract != null}">
+                            <div class="detail-row">
+                                <span class="detail-label">Phòng lưu trú</span>
+                                <span class="detail-value" th:text="${activeContract.room?.building?.name + ' - ' + activeContract.room?.roomNumber}"></span>
                             </div>
-                            <div class="flex-between mb-4">
-                                <span class="text-muted text-sm">Bắt đầu</span>
-                                <span th:text="${activeContract.startDate}"></span>
+                            <div class="detail-row">
+                                <span class="detail-label">Ngày bắt đầu</span>
+                                <span class="detail-value" th:text="${activeContract.startDate}"></span>
                             </div>
-                            <div class="flex-between mb-4">
-                                <span class="text-muted text-sm">Kết thúc</span>
-                                <span th:text="${activeContract.endDate}"></span>
+                            <div class="detail-row">
+                                <span class="detail-label">Ngày kết thúc</span>
+                                <span class="detail-value" th:text="${activeContract.endDate}"></span>
                             </div>
-                            <div class="flex-between">
-                                <span class="text-muted text-sm">Tiền phòng/tháng</span>
-                                <span class="font-bold" style="color:var(--accent-orange);"
+                            <div class="detail-row">
+                                <span class="detail-label">Tiền phòng/tháng</span>
+                                <span class="detail-value text-warning"
                                       th:text="${#numbers.formatDecimal(activeContract.monthlyFee,1,'COMMA',0,'POINT')} + ' đ'"></span>
                             </div>
                         </div>
-                        <div th:unless="${activeContract != null}" class="empty-state" style="padding:30px;">
-                            <div class="icon">📄</div>
-                            <h3>Chưa có hợp đồng</h3>
-                            <a class="btn btn-primary" style="margin-top:12px;" th:href="@{/student/register}">
-                                📝 Đăng ký phòng
+                        <div th:unless="${activeContract != null}" class="empty-state" style="padding: 28px;">
+                            <div class="icon"><i class="bi bi-file-earmark-plus"></i></div>
+                            <h3>Chưa có hợp đồng hiệu lực</h3>
+                            <a class="btn btn-primary mt-4" th:href="@{/student/register}">
+                                <i class="bi bi-journal-plus"></i> Đăng ký phòng
                             </a>
                         </div>
                     </div>
@@ -82,23 +90,23 @@
                 <!-- Hóa đơn gần đây -->
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">💰 Hóa đơn gần đây</span>
+                        <span class="card-title"><i class="bi bi-receipt"></i> Hóa đơn gần đây</span>
                         <a class="btn btn-sm btn-ghost" th:href="@{/student/invoices}">Xem tất cả</a>
                     </div>
-                    <div class="card-body" style="padding:0;">
-                        <div th:each="inv : ${recentInvoices}" style="padding:12px 20px; border-bottom:1px solid var(--border);">
+                    <div class="card-body" style="padding: 0;">
+                        <div th:each="inv : ${recentInvoices}" style="padding: 13px 20px; border-bottom: 1px solid var(--border);">
                             <div class="flex-between">
-                                <span th:text="'T' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></span>
-                                <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="font-bold" th:text="'Tháng ' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></span>
+                                <div class="flex-center gap-2">
                                     <span th:text="${#numbers.formatDecimal(inv.totalAmount,1,'COMMA',0,'POINT')} + ' đ'"
-                                          style="font-weight:600; color:var(--accent-orange);"></span>
+                                          class="font-bold text-warning"></span>
                                     <span th:if="${inv.status?.name() == 'UNPAID'}"  class="badge badge-warning">Chưa trả</span>
                                     <span th:if="${inv.status?.name() == 'PAID'}"    class="badge badge-success">Đã trả</span>
                                     <span th:if="${inv.status?.name() == 'OVERDUE'}" class="badge badge-danger">Quá hạn</span>
                                 </div>
                             </div>
                         </div>
-                        <div th:if="${#lists.isEmpty(recentInvoices)}" class="empty-state" style="padding:30px;">
+                        <div th:if="${#lists.isEmpty(recentInvoices)}" class="empty-state" style="padding: 28px;">
                             <p>Chưa có hóa đơn nào</p>
                         </div>
                     </div>

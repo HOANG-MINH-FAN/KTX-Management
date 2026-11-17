@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Quản lý Phòng ở')}"></head>
 <body>
 <div class="layout">
@@ -7,44 +7,54 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">🚪 Quản lý Phòng ở</div>
+                <div class="topbar-title"><i class="bi bi-door-open"></i> Quản lý Phòng ở</div>
                 <div class="topbar-subtitle" th:text="'Tổng cộng: ' + ${#lists.size(rooms)} + ' phòng'"></div>
             </div>
-            <a class="btn btn-primary" th:href="@{/admin/rooms/new}">➕ Thêm phòng</a>
+            <div class="topbar-right">
+                <a class="btn btn-primary" th:href="@{/admin/rooms/new}">
+                    <i class="bi bi-plus-lg"></i> Thêm phòng
+                </a>
+            </div>
         </div>
         <div class="page-content">
-            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
-
-            <div class="card mb-6">
-                <div class="card-body">
-                    <form th:action="@{/admin/rooms}" method="get" style="display:flex; gap:12px; align-items:center; flex-wrap: wrap;">
-                        <select name="buildingId" class="form-control" style="flex:1;">
-                            <option value="">-- Tất cả tòa nhà --</option>
-                            <option th:each="b : ${buildings}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == buildingId}"></option>
-                        </select>
-                        
-                        <select name="roomType" class="form-control" style="flex:1;">
-                            <option value="">-- Tất cả loại phòng --</option>
-                            <option th:each="t : ${roomTypes}" th:value="${t}" 
-                                    th:text="${t.name() == 'MALE' ? 'Nam' : (t.name() == 'FEMALE' ? 'Nữ' : 'Hỗn hợp')}"
-                                    th:selected="${t == roomType}"></option>
-                        </select>
-                        
-                        <select name="status" class="form-control" style="flex:1;">
-                            <option value="">-- Tất cả trạng thái --</option>
-                            <option th:each="st : ${statuses}" th:value="${st}" 
-                                    th:text="${st.name() == 'AVAILABLE' ? 'Còn chỗ' : (st.name() == 'FULL' ? 'Đầy' : 'Bảo trì')}"
-                                    th:selected="${st == status}"></option>
-                        </select>
-                        
-                        <button type="submit" class="btn btn-primary">🔍 Lọc</button>
-                        <a th:href="@{/admin/rooms}" class="btn btn-ghost" th:if="${buildingId != null or status != null or roomType != null}">❌ Xóa lọc</a>
-                    </form>
-                </div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
             </div>
 
             <div class="card">
+                <div class="card-header">
+                    <form th:action="@{/admin/rooms}" method="get" class="filter-bar" style="width: 100%;">
+                        <select name="buildingId" class="form-control" style="flex: 1; min-width: 160px;">
+                            <option value="">-- Tất cả tòa nhà --</option>
+                            <option th:each="b : ${buildings}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == buildingId}"></option>
+                        </select>
+
+                        <select name="roomType" class="form-control" style="flex: 1; min-width: 160px;">
+                            <option value="">-- Tất cả loại phòng --</option>
+                            <option th:each="t : ${roomTypes}" th:value="${t}"
+                                    th:text="${t.name() == 'MALE' ? 'Nam' : (t.name() == 'FEMALE' ? 'Nữ' : 'Hỗn hợp')}"
+                                    th:selected="${t == roomType}"></option>
+                        </select>
+
+                        <select name="status" class="form-control" style="flex: 1; min-width: 160px;">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            <option th:each="st : ${statuses}" th:value="${st}"
+                                    th:text="${st.name() == 'AVAILABLE' ? 'Còn chỗ' : (st.name() == 'FULL' ? 'Đầy' : 'Bảo trì')}"
+                                    th:selected="${st == status}"></option>
+                        </select>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-funnel"></i> Lọc dữ liệu
+                        </button>
+                        <a th:href="@{/admin/rooms}" class="btn btn-ghost" th:if="${buildingId != null or status != null or roomType != null}">
+                            <i class="bi bi-x-lg"></i> Xóa lọc
+                        </a>
+                    </form>
+                </div>
+
                 <div class="table-wrapper">
                     <table>
                         <thead>
@@ -75,7 +85,7 @@
                                 </td>
                                 <td th:text="${r.capacity}"></td>
                                 <td th:text="${r.occupied}"></td>
-                                <td th:text="${r.availableSlots}" style="color: var(--accent-green); font-weight:600;"></td>
+                                <td th:text="${r.availableSlots}" class="text-success font-bold"></td>
                                 <td th:text="${#numbers.formatDecimal(r.roomFeePerMonth, 1, 'COMMA', 0, 'POINT')} + ' đ'"></td>
                                 <td>
                                     <span th:if="${r.status?.name() == 'AVAILABLE'}"   class="badge badge-success">Còn chỗ</span>
@@ -83,11 +93,15 @@
                                     <span th:if="${r.status?.name() == 'MAINTENANCE'}"  class="badge badge-warning">Bảo trì</span>
                                 </td>
                                 <td>
-                                    <div style="display:flex; gap:6px;">
-                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/rooms/edit/{id}(id=${r.id})}">✏️</a>
+                                    <div class="flex gap-2">
+                                        <a class="btn btn-sm btn-ghost" th:href="@{/admin/rooms/edit/{id}(id=${r.id})}" title="Chỉnh sửa">
+                                            <i class="bi bi-pencil"></i> Sửa
+                                        </a>
                                         <form th:action="@{/admin/rooms/delete/{id}(id=${r.id})}" method="post"
                                               onsubmit="return confirm('Xóa phòng này?')">
-                                            <button class="btn btn-sm btn-danger" type="submit">🗑️</button>
+                                            <button class="btn btn-sm btn-danger" type="submit" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
@@ -95,7 +109,7 @@
                             <tr th:if="${#lists.isEmpty(rooms)}">
                                 <td colspan="11">
                                     <div class="empty-state">
-                                        <div class="icon">🚪</div>
+                                        <div class="icon"><i class="bi bi-door-open"></i></div>
                                         <h3>Chưa có phòng nào</h3>
                                     </div>
                                 </td>

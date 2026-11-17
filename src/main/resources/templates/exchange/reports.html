@@ -1,16 +1,26 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Báo cáo tin đăng')}"></head>
 <body>
 <div class="layout">
     <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
     <div class="main-content">
         <div class="topbar">
-            <div class="topbar-title">🚩 Báo cáo tin đăng</div>
+            <div>
+                <div class="topbar-title"><i class="bi bi-flag"></i> Báo cáo tin đăng</div>
+                <div class="topbar-subtitle">Phản ánh tin đăng không phù hợp với quy định KTX</div>
+            </div>
+            <div class="topbar-right">
+                <a th:href="@{/exchange/{id}(id=${item.id})}" class="btn btn-ghost btn-sm">
+                    <i class="bi bi-arrow-left"></i> Quay lại tin đăng
+                </a>
+            </div>
         </div>
         <div class="page-content">
-            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
-            <div class="card">
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+            <div class="card form-container-sm">
                 <div class="card-header">
                     <span class="card-title" th:text="'Tin: ' + ${item.title}"></span>
                 </div>
@@ -29,8 +39,12 @@
                             <textarea class="form-control" name="description" rows="4"
                                       placeholder="Mô tả vấn đề bạn gặp..."></textarea>
                         </div>
-                        <button type="submit" class="btn btn-danger">🚩 Gửi báo cáo</button>
-                        <a th:href="@{/exchange}" class="btn btn-ghost">Hủy</a>
+                        <div class="flex gap-3">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-flag"></i> Gửi báo cáo
+                            </button>
+                            <a th:href="@{/exchange}" class="btn btn-ghost">Hủy</a>
+                        </div>
                     </form>
                 </div>
             </div>

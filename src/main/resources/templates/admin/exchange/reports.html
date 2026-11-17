@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Báo cáo tin đăng')}"></head>
 <body>
 <div class="layout">
@@ -7,50 +7,67 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">🚩 Báo cáo tin trao đổi đồ</div>
+                <div class="topbar-title"><i class="bi bi-flag"></i> Báo cáo tin trao đổi đồ</div>
                 <div class="topbar-subtitle" th:text="'Chờ xử lý: ' + ${pendingCount}"></div>
             </div>
         </div>
         <div class="page-content">
-            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+
             <div class="card">
-                <div class="card-body" style="padding:0;">
-                    <div class="empty-state" th:if="${reports.isEmpty()}">
-                        <div class="icon">✅</div><h3>Chưa có báo cáo nào</h3>
-                    </div>
-                    <div class="table-wrapper" th:unless="${reports.isEmpty()}">
-                        <table>
-                            <thead>
-                            <tr><th>#</th><th>Tin đăng</th><th>Người báo cáo</th><th>Lý do</th>
-                                <th>Mô tả</th><th>Trạng thái</th><th>Thao tác</th></tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="r : ${reports}">
-                                <td th:text="${r.report.id}"></td>
-                                <td><a th:href="@{/exchange/{id}(id=${r.report.itemId})}" th:text="${r.itemTitle}"></a></td>
-                                <td th:text="${r.reporterName}"></td>
-                                <td th:text="${r.report.reason}"></td>
-                                <td th:text="${r.report.description}"></td>
-                                <td>
-                                    <span class="badge badge-warning" th:if="${r.report.status == 'PENDING'}">Chờ xử lý</span>
-                                    <span class="badge badge-success" th:if="${r.report.status == 'RESOLVED'}">Đã xử lý</span>
-                                </td>
-                                <td th:if="${r.report.status == 'PENDING'}">
-                                    <form th:action="@{/admin/exchange/reports/{id}/resolve(id=${r.report.id})}"
-                                          method="post" style="display:inline;">
-                                        <button class="btn btn-success btn-sm" type="submit">Đã xử lý</button>
+                <div class="empty-state" th:if="${reports.isEmpty()}">
+                    <div class="icon"><i class="bi bi-check2-circle"></i></div>
+                    <h3>Chưa có báo cáo vi phạm nào</h3>
+                </div>
+                <div class="table-wrapper" th:unless="${reports.isEmpty()}">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tin đăng</th>
+                            <th>Người báo cáo</th>
+                            <th>Lý do</th>
+                            <th>Mô tả</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="r : ${reports}">
+                            <td class="text-muted" th:text="${r.report.id}"></td>
+                            <td>
+                                <a class="font-bold" th:href="@{/exchange/{id}(id=${r.report.itemId})}" th:text="${r.itemTitle}"></a>
+                            </td>
+                            <td th:text="${r.reporterName}"></td>
+                            <td th:text="${r.report.reason}"></td>
+                            <td class="text-secondary" th:text="${r.report.description}"></td>
+                            <td>
+                                <span class="badge badge-warning" th:if="${r.report.status == 'PENDING'}">Chờ xử lý</span>
+                                <span class="badge badge-success" th:if="${r.report.status == 'RESOLVED'}">Đã xử lý</span>
+                            </td>
+                            <td th:if="${r.report.status == 'PENDING'}">
+                                <div class="flex gap-2">
+                                    <form th:action="@{/admin/exchange/reports/{id}/resolve(id=${r.report.id})}" method="post">
+                                        <button class="btn btn-success btn-sm" type="submit">
+                                            <i class="bi bi-check2"></i> Đã xử lý
+                                        </button>
                                     </form>
-                                    <form th:action="@{/admin/exchange/reports/{id}/hide-item(id=${r.report.id})}"
-                                          method="post" style="display:inline;">
-                                        <button class="btn btn-danger btn-sm" type="submit">Ẩn tin</button>
+                                    <form th:action="@{/admin/exchange/reports/{id}/hide-item(id=${r.report.id})}" method="post">
+                                        <button class="btn btn-danger btn-sm" type="submit">
+                                            <i class="bi bi-eye-slash"></i> Ẩn tin
+                                        </button>
                                     </form>
-                                </td>
-                                <td th:unless="${r.report.status == 'PENDING'}">—</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                </div>
+                            </td>
+                            <td th:unless="${r.report.status == 'PENDING'}" class="text-muted">—</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

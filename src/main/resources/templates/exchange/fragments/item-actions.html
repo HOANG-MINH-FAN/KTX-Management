@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="actions(itemId)" style="display:flex; gap:8px;">
+<div th:fragment="actions(itemId)" class="flex gap-2">
     <form th:action="@{/exchange/favorites/{id}/toggle(id=${itemId})}" method="post">
-        <button type="submit" class="btn btn-ghost btn-sm">🤍 Lưu / Bỏ lưu</button>
+        <button type="submit" class="btn btn-ghost btn-sm">
+            <i class="bi bi-bookmark-heart"></i> Lưu / Bỏ lưu
+        </button>
     </form>
-    <a class="btn btn-danger btn-sm" th:href="@{/exchange/reports/new(itemId=${itemId})}">🚩 Báo cáo</a>
+    <a class="btn btn-danger btn-sm" th:href="@{/exchange/reports/new(itemId=${itemId})}">
+        <i class="bi bi-flag"></i> Báo cáo
+    </a>
 </div>
 </body>
 </html>

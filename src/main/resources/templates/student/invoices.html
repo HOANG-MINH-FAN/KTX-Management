@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Hóa đơn của tôi')}"></head>
 <body>
 <div class="layout">
@@ -7,7 +7,8 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">💰 Hóa đơn của tôi</div>
+                <div class="topbar-title"><i class="bi bi-receipt"></i> Hóa đơn của tôi</div>
+                <div class="topbar-subtitle">Tra cứu tiền phòng, điện nước và trạng thái thanh toán</div>
             </div>
         </div>
         <div class="page-content">
@@ -25,9 +26,9 @@
                         </thead>
                         <tbody>
                             <tr th:each="inv, i : ${invoices}">
-                                <td th:text="${i.count}"></td>
-                                <td th:text="'Tháng ' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></td>
-                                <td class="font-bold" style="color:var(--accent-orange);"
+                                <td class="text-muted" th:text="${i.count}"></td>
+                                <td class="font-bold" th:text="'Tháng ' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></td>
+                                <td class="font-bold text-warning"
                                     th:text="${#numbers.formatDecimal(inv.totalAmount,1,'COMMA',0,'POINT')} + ' đ'"></td>
                                 <td th:text="${inv.dueDate}"></td>
                                 <td>
@@ -39,7 +40,7 @@
                             <tr th:if="${#lists.isEmpty(invoices)}">
                                 <td colspan="5">
                                     <div class="empty-state">
-                                        <div class="icon">💰</div>
+                                        <div class="icon"><i class="bi bi-receipt"></i></div>
                                         <h3>Chưa có hóa đơn nào</h3>
                                     </div>
                                 </td>

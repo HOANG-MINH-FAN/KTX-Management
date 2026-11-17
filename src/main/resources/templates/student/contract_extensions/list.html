@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Lịch sử yêu cầu gia hạn')}"></head>
 <body>
 <div class="layout">
@@ -7,13 +7,22 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">📝 Lịch sử yêu cầu gia hạn</div>
+                <div class="topbar-title"><i class="bi bi-calendar2-plus"></i> Lịch sử yêu cầu gia hạn</div>
+                <div class="topbar-subtitle">Theo dõi trạng thái phê duyệt gia hạn hợp đồng lưu trú</div>
             </div>
-            <a class="btn btn-primary" th:href="@{/student/contracts}">Quay lại hợp đồng</a>
+            <div class="topbar-right">
+                <a class="btn btn-ghost" th:href="@{/student/contracts}">
+                    <i class="bi bi-arrow-left"></i> Quay lại hợp đồng
+                </a>
+            </div>
         </div>
         <div class="page-content">
-            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
 
             <div class="card">
                 <div class="table-wrapper">
@@ -31,11 +40,11 @@
                         </thead>
                         <tbody>
                             <tr th:each="r, i : ${requests}">
-                                <td th:text="${i.count}"></td>
-                                <td th:text="${r.contract.room.building.name + ' - ' + r.contract.room.roomNumber}"></td>
+                                <td class="text-muted" th:text="${i.count}"></td>
+                                <td class="font-bold" th:text="${r.contract.room.building.name + ' - ' + r.contract.room.roomNumber}"></td>
                                 <td class="font-bold text-primary" th:text="${r.newEndDate}"></td>
-                                <td th:text="${r.reason}"></td>
-                                <td th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td class="text-secondary" th:text="${r.reason}"></td>
+                                <td class="text-muted text-sm" th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                                 <td>
                                     <span th:if="${r.status.name() == 'PENDING'}"   class="badge badge-warning">Chờ duyệt</span>
                                     <span th:if="${r.status.name() == 'APPROVED'}"  class="badge badge-success">Đã duyệt</span>
@@ -50,7 +59,7 @@
                             <tr th:if="${#lists.isEmpty(requests)}">
                                 <td colspan="7">
                                     <div class="empty-state">
-                                        <div class="icon">📄</div>
+                                        <div class="icon"><i class="bi bi-calendar2-check"></i></div>
                                         <h3>Chưa có yêu cầu gia hạn nào</h3>
                                     </div>
                                 </td>

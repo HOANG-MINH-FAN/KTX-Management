@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Thêm/Sửa Sinh viên')}"></head>
 <body>
 <div class="layout">
@@ -9,13 +9,21 @@
             <div>
                 <div class="topbar-title" th:text="${student.id != null} ? 'Chỉnh sửa sinh viên' : 'Thêm sinh viên mới'"></div>
             </div>
-            <a class="btn btn-ghost" th:href="@{/admin/students}">← Quay lại</a>
+            <div class="topbar-right">
+                <a class="btn btn-ghost" th:href="@{/admin/students}">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </div>
         </div>
         <div class="page-content">
-            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
 
-            <div class="card" style="max-width:700px;">
-                <div class="card-header"><span class="card-title">Thông tin sinh viên</span></div>
+            <div class="card form-container-md">
+                <div class="card-header">
+                    <span class="card-title"><i class="bi bi-person-vcard"></i> Hồ sơ sinh viên</span>
+                </div>
                 <div class="card-body">
                     <form th:action="@{/admin/students/save}" method="post">
                         <input type="hidden" name="id" th:value="${student.id}">
@@ -27,7 +35,7 @@
                                        th:value="${student.username}" required placeholder="VD: sv001">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Mật khẩu <span th:if="${student.id != null}">(để trống nếu không đổi)</span></label>
+                                <label class="form-label">Mật khẩu <span th:if="${student.id != null}" class="text-muted">(để trống nếu không đổi)</span></label>
                                 <input class="form-control" type="password" name="password"
                                        th:required="${student.id == null}" placeholder="Nhập mật khẩu">
                             </div>
@@ -85,8 +93,10 @@
                             </div>
                         </div>
 
-                        <div style="display:flex; gap:12px; margin-top:8px;">
-                            <button class="btn btn-primary" type="submit">💾 Lưu</button>
+                        <div class="flex gap-3" style="margin-top: 8px;">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-check2"></i> Lưu thông tin
+                            </button>
                             <a class="btn btn-ghost" th:href="@{/admin/students}">Hủy</a>
                         </div>
                     </form>

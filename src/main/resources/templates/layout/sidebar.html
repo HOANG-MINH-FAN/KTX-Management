@@ -2,15 +2,26 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <!-- ============================================================
-     LAYOUT FRAGMENT: sidebar + topbar
-     Sử dụng: th:replace="~{layout/sidebar :: layout(~{::content})}"
+     LAYOUT FRAGMENT: head + adminSidebar + studentSidebar
      ============================================================ -->
 
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title} + ' - KTX Management'">KTX Management</title>
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('ktx-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', saved);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script defer th:src="@{/js/ui.js}"></script>
 </head>
 
 <!-- Fragment: sidebar admin -->
@@ -18,70 +29,76 @@
     <aside class="sidebar">
         <div class="sidebar-logo">
             <div class="brand">
-                <div class="icon">🏠</div>
-                <span>KTX Management</span>
+                <div class="icon"><i class="bi bi-buildings"></i></div>
+                <div class="sidebar-brand-meta">
+                    <span>KTX Management</span>
+                    <span class="sidebar-brand-sub">Cổng Quản trị Đại học</span>
+                </div>
             </div>
         </div>
 
         <nav class="sidebar-nav">
             <div class="nav-section-label">Tổng quan</div>
             <a class="nav-item" th:href="@{/admin/dashboard}">
-                <span class="nav-icon">📊</span> Dashboard
+                <span class="nav-icon"><i class="bi bi-grid-1x2"></i></span> Dashboard
             </a>
-
             <a class="nav-item" th:href="@{/notifications}">
-                <span class="nav-icon">🔔</span> Thông báo
+                <span class="nav-icon"><i class="bi bi-bell"></i></span> Thông báo
             </a>
 
             <div class="nav-section-label">Cơ sở vật chất</div>
             <a class="nav-item" th:href="@{/admin/buildings}">
-                <span class="nav-icon">🏢</span> Tòa nhà
+                <span class="nav-icon"><i class="bi bi-building"></i></span> Tòa nhà
             </a>
             <a class="nav-item" th:href="@{/admin/rooms}">
-                <span class="nav-icon">🚪</span> Phòng ở
+                <span class="nav-icon"><i class="bi bi-door-open"></i></span> Phòng ở
             </a>
-
             <a class="nav-item" th:href="@{/admin/maintenance}">
-                <span class="nav-icon">🔧</span> Quản lý sửa chữa
+                <span class="nav-icon"><i class="bi bi-tools"></i></span> Quản lý sửa chữa
             </a>
 
-            <div class="nav-section-label">Sinh viên</div>
+            <div class="nav-section-label">Sinh viên &amp; Lưu trú</div>
             <a class="nav-item" th:href="@{/admin/students}">
-                <span class="nav-icon">👤</span> Sinh viên
+                <span class="nav-icon"><i class="bi bi-people"></i></span> Sinh viên
             </a>
             <a class="nav-item" th:href="@{/admin/registrations}">
-                <span class="nav-icon">📝</span> Đơn đăng ký
+                <span class="nav-icon"><i class="bi bi-journal-check"></i></span> Đơn đăng ký
             </a>
             <a class="nav-item" th:href="@{/admin/contracts}">
-                <span class="nav-icon">📄</span> Hợp đồng
+                <span class="nav-icon"><i class="bi bi-file-earmark-text"></i></span> Hợp đồng
             </a>
             <a class="nav-item" th:href="@{/admin/contract-extensions}">
-                <span class="nav-icon">📝</span> Yêu cầu gia hạn
+                <span class="nav-icon"><i class="bi bi-calendar2-plus"></i></span> Yêu cầu gia hạn
             </a>
 
-            <div class="nav-section-label">Tài chính</div>
+            <div class="nav-section-label">Tài chính &amp; Nội quy</div>
             <a class="nav-item" th:href="@{/admin/invoices}">
-                <span class="nav-icon">💰</span> Hóa đơn
+                <span class="nav-icon"><i class="bi bi-receipt"></i></span> Hóa đơn
             </a>
             <a class="nav-item" th:href="@{/admin/violations}">
-                <span class="nav-icon">⚠️</span> Vi phạm
+                <span class="nav-icon"><i class="bi bi-shield-exclamation"></i></span> Vi phạm
             </a>
+
             <div class="nav-section-label">Trao đổi đồ</div>
-            <a class="nav-item" th:href="@{/admin/exchange/reports}"><span class="nav-icon">🚩</span> Báo cáo tin</a>
-            <a class="nav-item" th:href="@{/admin/exchange/stats}"><span class="nav-icon">📈</span> Thống kê</a>
+            <a class="nav-item" th:href="@{/admin/exchange/reports}">
+                <span class="nav-icon"><i class="bi bi-flag"></i></span> Báo cáo tin
+            </a>
+            <a class="nav-item" th:href="@{/admin/exchange/stats}">
+                <span class="nav-icon"><i class="bi bi-bar-chart-line"></i></span> Thống kê
+            </a>
         </nav>
 
         <div class="sidebar-footer">
             <div class="sidebar-user">
-                <div class="avatar">A</div>
+                <div class="avatar"><i class="bi bi-person-badge"></i></div>
                 <div class="user-info">
                     <div class="name" sec:authentication="name">Admin</div>
                     <div class="role">Quản trị viên</div>
                 </div>
             </div>
             <form th:action="@{/logout}" method="post">
-                <button class="btn btn-ghost" style="width:100%; justify-content:center;" type="submit">
-                    🚪 Đăng xuất
+                <button class="btn btn-ghost" style="width:100%;" type="submit">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
                 </button>
             </form>
         </div>
@@ -93,69 +110,73 @@
     <aside class="sidebar">
         <div class="sidebar-logo">
             <div class="brand">
-                <div class="icon">🏠</div>
-                <span>KTX Management</span>
+                <div class="icon"><i class="bi bi-buildings"></i></div>
+                <div class="sidebar-brand-meta">
+                    <span>KTX Management</span>
+                    <span class="sidebar-brand-sub">Cổng thông tin Sinh viên</span>
+                </div>
             </div>
         </div>
 
         <nav class="sidebar-nav">
-            <div class="nav-section-label">Của tôi</div>
+            <div class="nav-section-label">Lưu trú cá nhân</div>
             <a class="nav-item" th:href="@{/student/dashboard}">
-                <span class="nav-icon">🏠</span> Trang chủ
+                <span class="nav-icon"><i class="bi bi-house-door"></i></span> Trang chủ
             </a>
             <a class="nav-item" th:href="@{/student/register}">
-                <span class="nav-icon">📝</span> Đăng ký phòng
+                <span class="nav-icon"><i class="bi bi-journal-plus"></i></span> Đăng ký phòng
             </a>
             <a class="nav-item" th:href="@{/student/contracts}">
-                <span class="nav-icon">📄</span> Hợp đồng
+                <span class="nav-icon"><i class="bi bi-file-earmark-text"></i></span> Hợp đồng
             </a>
             <a class="nav-item" th:href="@{/student/contract-extensions}">
-                <span class="nav-icon">📝</span> Yêu cầu gia hạn
+                <span class="nav-icon"><i class="bi bi-calendar2-plus"></i></span> Yêu cầu gia hạn
             </a>
-
             <a class="nav-item" th:href="@{/maintenance}">
-                <span class="nav-icon">🔧</span> Yêu cầu sửa chữa
+                <span class="nav-icon"><i class="bi bi-tools"></i></span> Yêu cầu sửa chữa
             </a>
-
-            <a class="nav-item" th:href="@{/notifications}">
-                <span class="nav-icon">🔔</span> Thông báo
-            </a>
-
             <a class="nav-item" th:href="@{/student/invoices}">
-                <span class="nav-icon">💰</span> Hóa đơn
+                <span class="nav-icon"><i class="bi bi-receipt"></i></span> Hóa đơn
+            </a>
+            <a class="nav-item" th:href="@{/notifications}">
+                <span class="nav-icon"><i class="bi bi-bell"></i></span> Thông báo
             </a>
 
-            <div class="nav-section-label">Trao đổi đồ</div>
+            <div class="nav-section-label">Trao đổi đồ dùng</div>
             <a class="nav-item" th:href="@{/exchange}">
-                <span class="nav-icon">🔄</span> Chợ trao đổi đồ
+                <span class="nav-icon"><i class="bi bi-shop"></i></span> Chợ trao đổi đồ
             </a>
             <a class="nav-item" th:href="@{/exchange/my-items}">
-                <span class="nav-icon">📦</span> Tin đăng của tôi
+                <span class="nav-icon"><i class="bi bi-box-seam"></i></span> Tin đăng của tôi
             </a>
             <a class="nav-item" th:href="@{/exchange/requests/sent}">
-                <span class="nav-icon">📤</span> Yêu cầu đã gửi
+                <span class="nav-icon"><i class="bi bi-send"></i></span> Yêu cầu đã gửi
             </a>
             <a class="nav-item" th:href="@{/exchange/requests/received}">
-                <span class="nav-icon">📥</span> Yêu cầu nhận được
+                <span class="nav-icon"><i class="bi bi-inbox"></i></span> Yêu cầu nhận được
             </a>
             <a class="nav-item" th:href="@{/exchange/history}">
-                <span class="nav-icon">🕒</span> Lịch sử giao dịch
+                <span class="nav-icon"><i class="bi bi-clock-history"></i></span> Lịch sử giao dịch
             </a>
-            <a class="nav-item" th:href="@{/exchange/favorites}"><span class="nav-icon">❤️</span> Tin đã lưu</a>
-            <a class="nav-item" th:href="@{/exchange/reviews}"><span class="nav-icon">⭐</span> Đánh giá</a>
+            <a class="nav-item" th:href="@{/exchange/favorites}">
+                <span class="nav-icon"><i class="bi bi-bookmark-heart"></i></span> Tin đã lưu
+            </a>
+            <a class="nav-item" th:href="@{/exchange/reviews}">
+                <span class="nav-icon"><i class="bi bi-star"></i></span> Đánh giá
+            </a>
         </nav>
 
         <div class="sidebar-footer">
             <div class="sidebar-user">
-                <div class="avatar" style="background: linear-gradient(135deg, #2dd4a0, #4f8ef7);">S</div>
+                <div class="avatar"><i class="bi bi-mortarboard"></i></div>
                 <div class="user-info">
                     <div class="name" sec:authentication="name">Sinh viên</div>
-                    <div class="role">Sinh viên</div>
+                    <div class="role">Sinh viên nội trú</div>
                 </div>
             </div>
             <form th:action="@{/logout}" method="post">
-                <button class="btn btn-ghost" style="width:100%; justify-content:center;" type="submit">
-                    🚪 Đăng xuất
+                <button class="btn btn-ghost" style="width:100%;" type="submit">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
                 </button>
             </form>
         </div>

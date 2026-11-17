@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
@@ -14,159 +13,99 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">🔧 Quản lý yêu cầu sửa chữa</div>
-                <div class="topbar-subtitle">
-                    Tiếp nhận và cập nhật tiến độ xử lý sự cố
-                </div>
+                <div class="topbar-title"><i class="bi bi-tools"></i> Quản lý yêu cầu sửa chữa</div>
+                <div class="topbar-subtitle">Tiếp nhận và cập nhật tiến độ xử lý sự cố kỹ thuật phòng ở</div>
             </div>
         </div>
 
         <main class="page-content">
 
             <!-- Thông báo kết quả -->
-            <div class="alert alert-success"
-                 th:if="${success}"
-                 th:text="${success}"></div>
-
-            <div class="alert alert-error"
-                 th:if="${error}"
-                 th:text="${error}"></div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
 
             <section class="card">
                 <div class="card-header">
-                    <span class="card-title">📋 Danh sách yêu cầu</span>
-                </div>
-
-                <div class="card-body">
-
-                    <!-- Bộ lọc trạng thái -->
-                    <form th:action="@{/admin/maintenance}"
-                          method="get"
-                          style="display:flex; gap:12px; align-items:center;
-                                 flex-wrap:wrap; margin-bottom:20px;">
-
-                        <label for="status" style="margin:0;">
-                            Lọc trạng thái:
-                        </label>
-
-                        <select id="status" name="status"
-                                style="width:auto; min-width:190px;">
-                            <option value=""
-                                    th:selected="${selectedStatus == ''}">
-                                Tất cả yêu cầu
-                            </option>
-
-                            <option value="PENDING"
-                                    th:selected="${selectedStatus == 'PENDING'}">
-                                Chờ tiếp nhận
-                            </option>
-
-                            <option value="IN_PROGRESS"
-                                    th:selected="${selectedStatus == 'IN_PROGRESS'}">
-                                Đang sửa chữa
-                            </option>
-
-                            <option value="COMPLETED"
-                                    th:selected="${selectedStatus == 'COMPLETED'}">
-                                Đã hoàn thành
-                            </option>
-
-                            <option value="REJECTED"
-                                    th:selected="${selectedStatus == 'REJECTED'}">
-                                Đã từ chối
-                            </option>
+                    <span class="card-title"><i class="bi bi-list-ul"></i> Danh sách yêu cầu sửa chữa</span>
+                    <form th:action="@{/admin/maintenance}" method="get" class="filter-bar">
+                        <label for="status" class="form-label" style="margin: 0;">Trạng thái:</label>
+                        <select id="status" name="status" class="form-control" style="width: auto; min-width: 180px;">
+                            <option value="" th:selected="${selectedStatus == ''}">Tất cả yêu cầu</option>
+                            <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">Chờ tiếp nhận</option>
+                            <option value="IN_PROGRESS" th:selected="${selectedStatus == 'IN_PROGRESS'}">Đang sửa chữa</option>
+                            <option value="COMPLETED" th:selected="${selectedStatus == 'COMPLETED'}">Đã hoàn thành</option>
+                            <option value="REJECTED" th:selected="${selectedStatus == 'REJECTED'}">Đã từ chối</option>
                         </select>
-
-                        <button class="btn btn-primary" type="submit">
-                            Lọc
+                        <button class="btn btn-primary btn-sm" type="submit">
+                            <i class="bi bi-funnel"></i> Lọc
                         </button>
-
-                        <a th:href="@{/admin/maintenance}"
-                           style="text-decoration:none;">
-                            Xóa bộ lọc
+                        <a th:href="@{/admin/maintenance}" class="btn btn-ghost btn-sm" th:if="${selectedStatus != null and selectedStatus != ''}">
+                            <i class="bi bi-x-lg"></i> Xóa bộ lọc
                         </a>
                     </form>
+                </div>
 
-                    <!-- Bảng danh sách yêu cầu -->
-                    <div style="overflow-x:auto;">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Phòng</th>
-                                <th>Sinh viên</th>
-                                <th>Sự cố</th>
-                                <th>Mô tả</th>
-                                <th>Ngày gửi</th>
-                                <th>Trạng thái và xử lý</th>
-                            </tr>
-                            </thead>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Phòng</th>
+                            <th>Sinh viên</th>
+                            <th>Sự cố</th>
+                            <th>Mô tả chi tiết</th>
+                            <th>Ngày gửi</th>
+                            <th style="min-width: 300px;">Trạng thái &amp; Xử lý</th>
+                        </tr>
+                        </thead>
 
-                            <tbody>
-                            <tr th:each="r : ${requests}">
-                                <td th:text="${r.room != null ? r.room.roomNumber : 'Chưa có'}"></td>
-
-                                <td th:text="${r.student != null ? r.student.studentCode : 'Chưa có'}"></td>
-
-                                <td th:text="${r.title}"></td>
-
-                                <td style="white-space:pre-wrap;"
-                                    th:text="${r.description}"></td>
-
-                                <td th:text="${r.createdAt != null ? #temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm') : 'Chưa có'}"></td>
-
-                                <td>
-                                    <form th:action="@{/admin/maintenance/{id}/status(id=${r.id})}"
-                                          method="post">
-
-                                        <label>Trạng thái</label>
-
-                                        <select name="status" required>
-                                            <option value="PENDING"
-                                                    th:selected="${r.status == 'PENDING'}">
-                                                Chờ tiếp nhận
-                                            </option>
-
-                                            <option value="IN_PROGRESS"
-                                                    th:selected="${r.status == 'IN_PROGRESS'}">
-                                                Đang sửa chữa
-                                            </option>
-
-                                            <option value="COMPLETED"
-                                                    th:selected="${r.status == 'COMPLETED'}">
-                                                Đã hoàn thành
-                                            </option>
-
-                                            <option value="REJECTED"
-                                                    th:selected="${r.status == 'REJECTED'}">
-                                                Từ chối
-                                            </option>
+                        <tbody>
+                        <tr th:each="r : ${requests}">
+                            <td>
+                                <span class="badge badge-info" th:text="${r.room != null ? r.room.roomNumber : 'Chưa có'}"></span>
+                            </td>
+                            <td class="font-bold" th:text="${r.student != null ? r.student.studentCode : 'Chưa có'}"></td>
+                            <td class="font-bold" th:text="${r.title}"></td>
+                            <td style="white-space: pre-wrap; max-width: 280px;" class="text-secondary" th:text="${r.description}"></td>
+                            <td class="text-muted text-sm" th:text="${r.createdAt != null ? #temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm') : 'Chưa có'}"></td>
+                            <td>
+                                <form th:action="@{/admin/maintenance/{id}/status(id=${r.id})}"
+                                      method="post"
+                                      style="display: flex; flex-direction: column; gap: 6px;">
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <select name="status" class="form-control" style="padding: 4px 8px; font-size: 0.78rem;" required>
+                                            <option value="PENDING" th:selected="${r.status == 'PENDING'}">Chờ tiếp nhận</option>
+                                            <option value="IN_PROGRESS" th:selected="${r.status == 'IN_PROGRESS'}">Đang sửa chữa</option>
+                                            <option value="COMPLETED" th:selected="${r.status == 'COMPLETED'}">Đã hoàn thành</option>
+                                            <option value="REJECTED" th:selected="${r.status == 'REJECTED'}">Từ chối</option>
                                         </select>
-
-                                        <label>Ghi chú cho sinh viên</label>
-
-                                        <input type="text"
-                                               name="adminNote"
-                                               placeholder="Nhập phản hồi"
-                                               th:value="${r.adminNote}">
-
-                                        <button class="btn btn-primary"
-                                                type="submit">
-                                            Cập nhật
+                                        <button class="btn btn-primary btn-sm" type="submit">
+                                            <i class="bi bi-check2"></i> Cập nhật
                                         </button>
-                                    </form>
-                                </td>
-                            </tr>
+                                    </div>
+                                    <input type="text"
+                                           name="adminNote"
+                                           class="form-control"
+                                           style="padding: 4px 8px; font-size: 0.78rem;"
+                                           placeholder="Ghi chú phản hồi cho sinh viên..."
+                                           th:value="${r.adminNote}">
+                                </form>
+                            </td>
+                        </tr>
 
-                            <tr th:if="${requests == null or requests.isEmpty()}">
-                                <td colspan="6"
-                                    style="text-align:center; padding:35px;">
-                                    Chưa có yêu cầu sửa chữa nào.
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
+                        <tr th:if="${requests == null or requests.isEmpty()}">
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <div class="icon"><i class="bi bi-tools"></i></div>
+                                    <h3>Chưa có yêu cầu sửa chữa nào</h3>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 

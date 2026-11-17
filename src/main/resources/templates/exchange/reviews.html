@@ -1,28 +1,43 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Đánh giá')}"></head>
 <body>
 <div class="layout">
     <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
     <div class="main-content">
-        <div class="topbar"><div class="topbar-title">⭐ Đánh giá giao dịch</div></div>
+        <div class="topbar">
+            <div>
+                <div class="topbar-title"><i class="bi bi-star"></i> Đánh giá giao dịch</div>
+                <div class="topbar-subtitle">Tổng hợp điểm uy tín và nhận xét sau giao dịch trao đổi đồ</div>
+            </div>
+        </div>
         <div class="page-content">
-            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
 
-            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                <div class="stat-card yellow"><div class="stat-icon">⭐</div>
+            <div class="stats-grid">
+                <div class="stat-card yellow">
+                    <div class="stat-icon"><i class="bi bi-star"></i></div>
                     <div class="stat-value"
                          th:text="${average != null ? #numbers.formatDecimal(average,1,'COMMA',1,'POINT') : '—'}">—</div>
-                    <div class="stat-label">Điểm trung bình bạn nhận được</div></div>
-                <div class="stat-card blue"><div class="stat-icon">💬</div>
+                    <div class="stat-label">Điểm trung bình bạn nhận được</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-icon"><i class="bi bi-chat-square-quote"></i></div>
                     <div class="stat-value" th:text="${received.size()}">0</div>
-                    <div class="stat-label">Lượt đánh giá nhận được</div></div>
+                    <div class="stat-label">Lượt đánh giá nhận được</div>
+                </div>
             </div>
 
             <!-- Form: chỉ hiện khi có ?requestId= -->
-            <div class="card" th:if="${requestId != null}" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title" th:text="'Đánh giá giao dịch #' + ${requestId}"></span></div>
+            <div class="card form-container-sm mb-4" th:if="${requestId != null}">
+                <div class="card-header">
+                    <span class="card-title" th:text="'Đánh giá giao dịch #' + ${requestId}"></span>
+                </div>
                 <div class="card-body">
                     <form th:action="@{/exchange/reviews}" method="post">
                         <input type="hidden" name="requestId" th:value="${requestId}">
@@ -38,46 +53,70 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nhận xét</label>
-                            <textarea class="form-control" name="comment" rows="3"></textarea>
+                            <textarea class="form-control" name="comment" rows="3" placeholder="Chia sẻ trải nghiệm giao dịch của bạn..."></textarea>
                         </div>
-                        <button class="btn btn-primary" type="submit">Gửi đánh giá</button>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-send"></i> Gửi đánh giá
+                        </button>
                     </form>
                 </div>
             </div>
 
-            <div class="card" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title">📥 Đánh giá bạn nhận được</span></div>
-                <div class="card-body" style="padding:0;">
-                    <div class="empty-state" th:if="${received.isEmpty()}"><h3>Chưa có đánh giá nào</h3></div>
+            <div class="detail-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="bi bi-inbox"></i> Đánh giá bạn nhận được</span>
+                    </div>
+                    <div class="empty-state" th:if="${received.isEmpty()}">
+                        <div class="icon"><i class="bi bi-star"></i></div>
+                        <h3>Chưa có đánh giá nào</h3>
+                    </div>
                     <div class="table-wrapper" th:unless="${received.isEmpty()}">
                         <table>
-                            <thead><tr><th>Từ</th><th>Điểm</th><th>Nhận xét</th><th>Ngày</th></tr></thead>
+                            <thead>
+                            <tr>
+                                <th>Từ</th>
+                                <th>Điểm</th>
+                                <th>Nhận xét</th>
+                                <th>Ngày</th>
+                            </tr>
+                            </thead>
                             <tbody>
                             <tr th:each="r : ${received}">
-                                <td th:text="${names[r.reviewerId]}"></td>
-                                <td th:text="${r.rating} + ' ⭐'"></td>
-                                <td th:text="${r.comment}"></td>
-                                <td th:text="${#temporals.format(r.createdAt,'dd/MM/yyyy')}"></td>
+                                <td class="font-bold" th:text="${names[r.reviewerId]}"></td>
+                                <td><span class="badge badge-warning" th:text="${r.rating} + ' / 5'"></span></td>
+                                <td class="text-secondary" th:text="${r.comment}"></td>
+                                <td class="text-muted text-sm" th:text="${#temporals.format(r.createdAt,'dd/MM/yyyy')}"></td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <div class="card" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title">📤 Đánh giá bạn đã viết</span></div>
-                <div class="card-body" style="padding:0;">
-                    <div class="empty-state" th:if="${written.isEmpty()}"><h3>Bạn chưa viết đánh giá nào</h3></div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="bi bi-send"></i> Đánh giá bạn đã viết</span>
+                    </div>
+                    <div class="empty-state" th:if="${written.isEmpty()}">
+                        <div class="icon"><i class="bi bi-chat-square-text"></i></div>
+                        <h3>Bạn chưa viết đánh giá nào</h3>
+                    </div>
                     <div class="table-wrapper" th:unless="${written.isEmpty()}">
                         <table>
-                            <thead><tr><th>Cho</th><th>Điểm</th><th>Nhận xét</th><th>Ngày</th></tr></thead>
+                            <thead>
+                            <tr>
+                                <th>Cho</th>
+                                <th>Điểm</th>
+                                <th>Nhận xét</th>
+                                <th>Ngày</th>
+                            </tr>
+                            </thead>
                             <tbody>
                             <tr th:each="r : ${written}">
-                                <td th:text="${names[r.revieweeId]}"></td>
-                                <td th:text="${r.rating} + ' ⭐'"></td>
-                                <td th:text="${r.comment}"></td>
-                                <td th:text="${#temporals.format(r.createdAt,'dd/MM/yyyy')}"></td>
+                                <td class="font-bold" th:text="${names[r.revieweeId]}"></td>
+                                <td><span class="badge badge-info" th:text="${r.rating} + ' / 5'"></span></td>
+                                <td class="text-secondary" th:text="${r.comment}"></td>
+                                <td class="text-muted text-sm" th:text="${#temporals.format(r.createdAt,'dd/MM/yyyy')}"></td>
                             </tr>
                             </tbody>
                         </table>

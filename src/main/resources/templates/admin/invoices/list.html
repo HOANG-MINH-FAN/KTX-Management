@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Quản lý Hóa đơn')}"></head>
 <body>
 <div class="layout">
@@ -7,13 +7,22 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">💰 Quản lý Hóa đơn</div>
+                <div class="topbar-title"><i class="bi bi-receipt"></i> Quản lý Hóa đơn</div>
+                <div class="topbar-subtitle">Theo dõi và ghi nhận thanh toán phí nội trú hàng tháng</div>
             </div>
-            <a class="btn btn-primary" th:href="@{/admin/invoices/create}">➕ Tạo hóa đơn</a>
+            <div class="topbar-right">
+                <a class="btn btn-primary" th:href="@{/admin/invoices/create}">
+                    <i class="bi bi-plus-lg"></i> Tạo hóa đơn
+                </a>
+            </div>
         </div>
         <div class="page-content">
-            <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-            <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
 
             <div class="card">
                 <div class="table-wrapper">
@@ -32,11 +41,11 @@
                         </thead>
                         <tbody>
                             <tr th:each="inv, i : ${invoices}">
-                                <td th:text="${i.count}"></td>
-                                <td th:text="${inv.contract?.student?.fullName}"></td>
+                                <td class="text-muted" th:text="${i.count}"></td>
+                                <td class="font-bold" th:text="${inv.contract?.student?.fullName}"></td>
                                 <td th:text="${inv.contract?.room?.building?.name} + ' - ' + ${inv.contract?.room?.roomNumber}"></td>
                                 <td th:text="'T' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></td>
-                                <td class="font-bold" style="color:var(--accent-orange);"
+                                <td class="font-bold text-warning"
                                     th:text="${#numbers.formatDecimal(inv.totalAmount,1,'COMMA',0,'POINT')} + ' đ'"></td>
                                 <td th:text="${inv.dueDate}"></td>
                                 <td>
@@ -47,19 +56,23 @@
                                 <td>
                                     <form th:unless="${inv.isPaid()}"
                                           th:action="@{/admin/invoices/pay/{id}(id=${inv.id})}" method="post"
-                                          style="display:inline-flex; gap:6px; align-items:center;">
-                                        <input class="form-control" style="width:120px; padding:5px 8px; font-size:0.78rem;"
+                                          class="flex gap-2" style="align-items: center;">
+                                        <input class="form-control" style="width: 120px; padding: 4px 8px; font-size: 0.78rem;"
                                                type="number" name="amountPaid"
                                                th:value="${inv.totalAmount}" min="0" step="1000">
-                                        <button class="btn btn-sm btn-success" type="submit">✅ Ghi TT</button>
+                                        <button class="btn btn-sm btn-success" type="submit">
+                                            <i class="bi bi-check2"></i> Ghi TT
+                                        </button>
                                     </form>
-                                    <span th:if="${inv.isPaid()}" class="text-muted text-sm">✓ Hoàn tất</span>
+                                    <span th:if="${inv.isPaid()}" class="text-muted text-sm">
+                                        <i class="bi bi-check-all"></i> Hoàn tất
+                                    </span>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(invoices)}">
                                 <td colspan="8">
                                     <div class="empty-state">
-                                        <div class="icon">💰</div>
+                                        <div class="icon"><i class="bi bi-receipt"></i></div>
                                         <h3>Chưa có hóa đơn nào</h3>
                                     </div>
                                 </td>

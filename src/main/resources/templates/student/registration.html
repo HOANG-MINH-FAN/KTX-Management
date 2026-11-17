@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Đăng ký phòng')}"></head>
 <body>
 <div class="layout">
@@ -7,15 +7,19 @@
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title">📝 Đăng ký phòng ở</div>
-                <div class="topbar-subtitle">Chọn phòng phù hợp và gửi đơn đăng ký</div>
+                <div class="topbar-title"><i class="bi bi-journal-plus"></i> Đăng ký phòng ở</div>
+                <div class="topbar-subtitle">Chọn phòng phù hợp và gửi đơn đăng ký nội trú</div>
             </div>
         </div>
         <div class="page-content">
-            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
 
-            <div class="card" style="max-width:600px;">
-                <div class="card-header"><span class="card-title">📋 Thông tin đăng ký</span></div>
+            <div class="card form-container-sm">
+                <div class="card-header">
+                    <span class="card-title"><i class="bi bi-card-checklist"></i> Thông tin đăng ký</span>
+                </div>
                 <div class="card-body">
                     <form th:action="@{/student/register}" method="post">
 
@@ -46,11 +50,13 @@
                         </div>
 
                         <div class="alert alert-info">
-                            ℹ️ Sau khi gửi, quản trị viên sẽ xem xét và duyệt đơn của bạn.
-                            Khi được duyệt, hợp đồng sẽ tự động được tạo.
+                            <i class="bi bi-info-circle"></i>
+                            <span>Sau khi gửi, Ban quản lý sẽ xem xét và duyệt đơn của bạn. Khi được duyệt, hợp đồng sẽ tự động được khởi tạo.</span>
                         </div>
 
-                        <button class="btn btn-primary" type="submit">📤 Gửi đơn đăng ký</button>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-send"></i> Gửi đơn đăng ký
+                        </button>
                     </form>
                 </div>
             </div>

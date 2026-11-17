@@ -1,27 +1,43 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Hợp đồng của tôi')}"></head>
 <body>
 <div class="layout">
     <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
     <div class="main-content">
         <div class="topbar">
-            <div><div class="topbar-title">📄 Hợp đồng của tôi</div></div>
+            <div>
+                <div class="topbar-title"><i class="bi bi-file-earmark-text"></i> Hợp đồng của tôi</div>
+                <div class="topbar-subtitle">Danh sách hợp đồng lưu trú ký túc xá</div>
+            </div>
+            <div class="topbar-right">
+                <a class="btn btn-ghost btn-sm" th:href="@{/student/contract-extensions}">
+                    <i class="bi bi-calendar2-plus"></i> Lịch sử xin gia hạn
+                </a>
+            </div>
         </div>
         <div class="page-content">
             <div class="card">
                 <div class="table-wrapper">
                     <table>
                         <thead>
-                            <tr><th>#</th><th>Phòng</th><th>Bắt đầu</th><th>Kết thúc</th><th>Tiền/tháng</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Phòng</th>
+                                <th>Bắt đầu</th>
+                                <th>Kết thúc</th>
+                                <th>Tiền/tháng</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
                         </thead>
                         <tbody>
                             <tr th:each="c, i : ${contracts}">
-                                <td th:text="${i.count}"></td>
-                                <td th:text="${c.room?.building?.name + ' - ' + c.room?.roomNumber}"></td>
+                                <td class="text-muted" th:text="${i.count}"></td>
+                                <td class="font-bold" th:text="${c.room?.building?.name + ' - ' + c.room?.roomNumber}"></td>
                                 <td th:text="${c.startDate}"></td>
                                 <td th:text="${c.endDate}"></td>
-                                <td th:text="${#numbers.formatDecimal(c.monthlyFee,1,'COMMA',0,'POINT')} + ' đ'"></td>
+                                <td class="font-bold" th:text="${#numbers.formatDecimal(c.monthlyFee,1,'COMMA',0,'POINT')} + ' đ'"></td>
                                 <td>
                                     <span th:if="${c.status?.name() == 'ACTIVE'}"      class="badge badge-success">Đang hiệu lực</span>
                                     <span th:if="${c.status?.name() == 'EXPIRED'}"     class="badge badge-secondary">Hết hạn</span>
@@ -29,20 +45,24 @@
                                 </td>
                                 <td>
                                     <div th:if="${c.status?.name() == 'ACTIVE'}">
-                                        <button class="btn btn-sm btn-primary" th:onclick="'document.getElementById(\'extend-form-' + ${c.id} + '\').style.display=\'block\''">Yêu cầu gia hạn</button>
-                                        <div th:id="'extend-form-' + ${c.id}" style="display:none; margin-top:8px; border:1px solid #eee; padding:10px; border-radius:4px;">
-                                            <form th:action="@{/student/contract-extensions/create}" method="post" style="display:flex; flex-direction:column; gap:8px;">
+                                        <button class="btn btn-sm btn-primary" th:onclick="'document.getElementById(\'extend-form-' + ${c.id} + '\').style.display=\'block\''">
+                                            <i class="bi bi-calendar-plus"></i> Yêu cầu gia hạn
+                                        </button>
+                                        <div th:id="'extend-form-' + ${c.id}" style="display: none; margin-top: 10px; border: 1px solid var(--border); background-color: var(--bg-subtle); padding: 12px; border-radius: var(--radius-sm);">
+                                            <form th:action="@{/student/contract-extensions/create}" method="post" style="display: flex; flex-direction: column; gap: 10px;">
                                                 <input type="hidden" name="contractId" th:value="${c.id}">
                                                 <div>
-                                                    <label class="text-sm">Gia hạn đến ngày:</label>
+                                                    <label class="form-label">Gia hạn đến ngày:</label>
                                                     <input type="date" name="newEndDate" class="form-control" required>
                                                 </div>
                                                 <div>
-                                                    <label class="text-sm">Lý do (tuỳ chọn):</label>
+                                                    <label class="form-label">Lý do (tuỳ chọn):</label>
                                                     <input type="text" name="reason" class="form-control" placeholder="Lý do gia hạn">
                                                 </div>
-                                                <div style="display:flex; gap:6px;">
-                                                    <button class="btn btn-sm btn-success" type="submit">Gửi</button>
+                                                <div class="flex gap-2">
+                                                    <button class="btn btn-sm btn-success" type="submit">
+                                                        <i class="bi bi-check2"></i> Gửi yêu cầu
+                                                    </button>
                                                     <button type="button" class="btn btn-sm btn-ghost" th:onclick="'document.getElementById(\'extend-form-' + ${c.id} + '\').style.display=\'none\''">Hủy</button>
                                                 </div>
                                             </form>
@@ -51,11 +71,13 @@
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(contracts)}">
-                                <td colspan="6">
+                                <td colspan="7">
                                     <div class="empty-state">
-                                        <div class="icon">📄</div>
+                                        <div class="icon"><i class="bi bi-file-earmark-text"></i></div>
                                         <h3>Chưa có hợp đồng nào</h3>
-                                        <a class="btn btn-primary" style="margin-top:12px;" th:href="@{/student/register}">📝 Đăng ký phòng</a>
+                                        <a class="btn btn-primary mt-4" th:href="@{/student/register}">
+                                            <i class="bi bi-journal-plus"></i> Đăng ký phòng
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
