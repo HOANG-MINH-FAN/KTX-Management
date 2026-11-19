@@ -1,120 +1,231 @@
+
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Tạo Hóa đơn')}"></head>
 <body>
 <div class="layout">
     <div th:replace="~{layout/sidebar :: adminSidebar}"></div>
+
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title"><i class="bi bi-receipt"></i> Tạo Hóa đơn tháng</div>
-                <div class="topbar-subtitle">Tổng hợp tiền phòng, điện, nước và phí dịch vụ theo hợp đồng</div>
+                <div class="topbar-title">
+                    <i class="bi bi-receipt"></i> Tạo Hóa đơn tháng
+                </div>
+                <div class="topbar-subtitle">
+                    Tạo hóa đơn cho các sinh viên đang ở cùng một phòng
+                </div>
             </div>
+
             <div class="topbar-right">
                 <a class="btn btn-ghost" th:href="@{/admin/invoices}">
                     <i class="bi bi-arrow-left"></i> Quay lại
                 </a>
             </div>
         </div>
+
         <div class="page-content">
+
+            <!-- Thong bao loi -->
             <div class="alert alert-error" th:if="${error}">
-                <i class="bi bi-exclamation-circle"></i> <span th:text="${error}"></span>
+                <i class="bi bi-exclamation-circle"></i>
+                <span th:text="${error}"></span>
             </div>
 
             <div class="card form-container-md">
                 <div class="card-header">
-                    <span class="card-title"><i class="bi bi-file-earmark-plus"></i> Thông tin hóa đơn</span>
+                    <span class="card-title">
+                        <i class="bi bi-file-earmark-plus"></i>
+                        Thông tin hóa đơn
+                    </span>
                 </div>
+
                 <div class="card-body">
                     <form th:action="@{/admin/invoices/create}" method="post">
 
-                        <!-- Hợp đồng -->
+                        <!-- Chon phong -->
                         <div class="form-group">
-                            <label class="form-label">Hợp đồng *</label>
-                            <select class="form-control" name="contractId" required>
-                                <option value="">-- Chọn hợp đồng --</option>
-                                <option th:each="c : ${contracts}"
-                                        th:value="${c.id}"
-                                        th:text="${c.student?.fullName} + ' — Phòng ' + ${c.room?.roomNumber} + ' (' + ${c.room?.building?.name} + ')'">
+                            <label class="form-label">Phòng *</label>
+
+                            <select class="form-control" name="roomId" required>
+                                <option value="">-- Chọn phòng --</option>
+
+                                <option th:each="r : ${rooms}"
+                                        th:value="${r.id}"
+                                        th:text="|${r.building.name} - Phòng ${r.roomNumber}|">
                                 </option>
                             </select>
+
+                            <small class="text-muted">
+                                Hệ thống tự lấy các sinh viên có hợp đồng ACTIVE trong phòng.
+                            </small>
                         </div>
 
-                        <!-- Kỳ hóa đơn -->
+                        <!-- Ky hoa don -->
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label">Tháng *</label>
+
                                 <select class="form-control" name="month" required>
                                     <option th:each="m : ${#numbers.sequence(1,12)}"
-                                            th:value="${m}" th:text="'Tháng ' + ${m}"></option>
+                                            th:value="${m}"
+                                            th:text="'Tháng ' + ${m}">
+                                    </option>
                                 </select>
                             </div>
+
                             <div class="form-group">
                                 <label class="form-label">Năm *</label>
-                                <input class="form-control" type="number" name="year"
-                                       th:value="${#dates.year(#dates.createNow())}" required min="2020" max="2030">
+
+                                <input class="form-control"
+                                       type="number"
+                                       name="year"
+                                       th:value="${#dates.year(#dates.createNow())}"
+                                       required
+                                       min="2020"
+                                       max="2030">
                             </div>
                         </div>
 
-                        <!-- Chỉ số điện -->
-                        <div style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background-color: var(--bg-subtle); margin-bottom: 16px;">
-                            <div class="font-bold" style="margin-bottom: 12px; font-size: 0.85rem;">
-                                <i class="bi bi-lightning-charge text-warning"></i> Chỉ số điện (ElectricityFee)
+                        <!-- Chi so dien ca phong -->
+                        <div style="padding: 16px;
+                                    border: 1px solid var(--border);
+                                    border-radius: var(--radius-sm);
+                                    background-color: var(--bg-subtle);
+                                    margin-bottom: 16px;">
+
+                            <div class="font-bold"
+                                 style="margin-bottom: 12px; font-size: 0.9rem;">
+                                <i class="bi bi-lightning-charge text-warning"></i>
+                                Chỉ số điện của cả phòng
                             </div>
+
                             <div class="form-grid">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label">Chỉ số cũ (kWh)</label>
-                                    <input class="form-control" type="number" name="prevElec" value="0" min="0">
+
+                                    <input class="form-control"
+                                           type="number"
+                                           name="prevElec"
+                                           value="0"
+                                           min="0"
+                                           required>
                                 </div>
+
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label">Chỉ số mới (kWh)</label>
-                                    <input class="form-control" type="number" name="currElec" value="0" min="0">
+
+                                    <input class="form-control"
+                                           type="number"
+                                           name="currElec"
+                                           value="0"
+                                           min="0"
+                                           required>
                                 </div>
+
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label">Giá/kWh (đ)</label>
-                                    <input class="form-control" type="number" name="pricePerKwh" value="3500" min="0">
+
+                                    <input class="form-control"
+                                           type="number"
+                                           name="pricePerKwh"
+                                           value="3500"
+                                           min="0"
+                                           required>
                                 </div>
                             </div>
+
+                            <small class="text-muted">
+                                Tiền điện được tính từ tổng mức tiêu thụ của phòng
+                                và chia đều cho các sinh viên có hợp đồng ACTIVE.
+                            </small>
                         </div>
 
-                        <!-- Chỉ số nước -->
-                        <div style="padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background-color: var(--bg-subtle); margin-bottom: 16px;">
-                            <div class="font-bold" style="margin-bottom: 12px; font-size: 0.85rem;">
-                                <i class="bi bi-droplet text-primary"></i> Chỉ số nước (WaterFee)
+                        <!-- Chi so nuoc ca phong -->
+                        <div style="padding: 16px;
+                                    border: 1px solid var(--border);
+                                    border-radius: var(--radius-sm);
+                                    background-color: var(--bg-subtle);
+                                    margin-bottom: 16px;">
+
+                            <div class="font-bold"
+                                 style="margin-bottom: 12px; font-size: 0.9rem;">
+                                <i class="bi bi-droplet text-primary"></i>
+                                Chỉ số nước của cả phòng
                             </div>
+
                             <div class="form-grid">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label">Chỉ số cũ (m³)</label>
-                                    <input class="form-control" type="number" name="prevWater" value="0" min="0">
+
+                                    <input class="form-control"
+                                           type="number"
+                                           name="prevWater"
+                                           value="0"
+                                           min="0"
+                                           required>
                                 </div>
+
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label">Chỉ số mới (m³)</label>
-                                    <input class="form-control" type="number" name="currWater" value="0" min="0">
+
+                                    <input class="form-control"
+                                           type="number"
+                                           name="currWater"
+                                           value="0"
+                                           min="0"
+                                           required>
                                 </div>
+
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label">Giá/m³ (đ)</label>
-                                    <input class="form-control" type="number" name="pricePerM3" value="10000" min="0">
+
+                                    <input class="form-control"
+                                           type="number"
+                                           name="pricePerM3"
+                                           value="10000"
+                                           min="0"
+                                           required>
                                 </div>
                             </div>
+
+                            <small class="text-muted">
+                                Tiền nước được tính từ tổng mức tiêu thụ của phòng
+                                và chia đều cho các sinh viên có hợp đồng ACTIVE.
+                            </small>
                         </div>
 
-                        <!-- Phí dịch vụ -->
+                        <!-- Phi dich vu -->
                         <div class="form-group">
-                            <label class="form-label">Phí dịch vụ phát sinh (đ, để 0 nếu không có)</label>
-                            <input class="form-control" type="number" name="serviceFee" value="0" min="0">
+                            <label class="form-label">
+                                Tổng phí dịch vụ cả phòng (đ)
+                            </label>
+
+                            <input class="form-control"
+                                   type="number"
+                                   name="serviceFee"
+                                   value="0"
+                                   min="0"
+                                   required>
+
+                            <small class="text-muted">
+                                Phí dịch vụ sẽ được chia đều cho các sinh viên trong phòng.
+                            </small>
                         </div>
 
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i>
-                            <span>Hệ thống tự động tổng hợp RoomFee, ElectricityFee, WaterFee và ServiceFee thông qua cơ chế đa hình <code>calculateFee()</code>.</span>
-                        </div>
-
+                        <!-- Nut thao tac -->
                         <div class="flex gap-3">
                             <button class="btn btn-primary" type="submit">
-                                <i class="bi bi-check2"></i> Tạo hóa đơn
+                                <i class="bi bi-check2"></i>
+                                Tạo hóa đơn cho phòng
                             </button>
-                            <a class="btn btn-ghost" th:href="@{/admin/invoices}">Hủy</a>
+
+                            <a class="btn btn-ghost"
+                               th:href="@{/admin/invoices}">
+                                Hủy
+                            </a>
                         </div>
+
                     </form>
                 </div>
             </div>

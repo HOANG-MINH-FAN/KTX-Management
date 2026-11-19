@@ -75,6 +75,8 @@ public class InvoiceDetail {
     @DecimalMin("0.0")
     @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal amount = BigDecimal.ZERO;
+    @Column(name = "share_count")
+    private Integer shareCount;
 
     // ===================== Constructors =====================
 
@@ -88,6 +90,12 @@ public class InvoiceDetail {
         this.quantity    = quantity;
         this.unitPrice   = unitPrice;
         this.amount      = amount;
+    }
+    public InvoiceDetail(Invoice invoice, FeeType feeType, String description,
+                     BigDecimal quantity, BigDecimal unitPrice, BigDecimal amount,
+                     Integer shareCount) {
+        this(invoice, feeType, description, quantity, unitPrice, amount); 
+        this.shareCount = shareCount;
     }
 
     // ===================== Getters & Setters =====================
@@ -112,6 +120,13 @@ public class InvoiceDetail {
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
 
+    public Integer getShareCount() { return shareCount; }
+    public void setShareCount(Integer shareCount) { this.shareCount = shareCount; }
+
+    /** Tổng tiền cả phòng = số lượng × đơn giá. */
+    public BigDecimal getRoomTotal() {
+        return quantity.multiply(unitPrice);
+    }
     @Override
     public String toString() {
         return "InvoiceDetail{feeType=" + feeType + ", description='" + description

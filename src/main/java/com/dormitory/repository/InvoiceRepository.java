@@ -57,4 +57,10 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
      */
     @Query("SELECT i FROM Invoice i WHERE i.status IN :statuses ORDER BY i.dueDate ASC")
     List<Invoice> findByStatusIn(@org.springframework.data.repository.query.Param("statuses") List<InvoiceStatus> statuses);
+
+    @Query("SELECT i FROM Invoice i JOIN i.contract c " +
+       "WHERE c.room.id = :roomId " +
+       "AND i.status IN ('UNPAID', 'OVERDUE') " +
+       "ORDER BY i.periodYear DESC, i.periodMonth DESC")
+    List<Invoice> findUnpaidInvoicesByRoomId(Long roomId);
 }

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/sidebar :: head('Xác nhận thanh toán')}"></head>
+<body>
+<div class="layout">
+
+    <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+
+    <div class="main-content">
+
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">
+                    Xác nhận thanh toán
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="alert alert-error" th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    Danh sách hóa đơn đã chọn
+                </div>
+
+                <div class="card-body">
+
+                    <div th:each="inv : ${selectedInvoices}">
+                        <p>
+                            Hóa đơn tháng
+                            <span th:text="${inv.periodMonth}"></span>/
+                            <span th:text="${inv.periodYear}"></span>
+                            -
+                            <span th:text="${inv.contract.student.fullName}"></span>
+                        </p>
+                        <p th:text="${#numbers.formatDecimal(
+                            inv.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' đ'">
+                        </p>
+                    </div>
+
+                    <hr>
+
+                    <h3>
+                        Tổng tiền:
+                        <span th:text="${#numbers.formatDecimal(
+                            total, 1, 'COMMA', 0, 'POINT')} + ' đ'">
+                        </span>
+                    </h3>
+
+                                        <div class="qr-wrap">
+                        <div id="qrBox" class="qr-box" th:attr="data-content=${qrContent}"></div>
+
+                        <div>
+                            <div class="text-muted">Mã thanh toán</div>
+                            <div class="qr-code-text" th:text="${paymentCode}"></div>
+                        </div>
+                    </div>
+
+                    <a th:href="@{/student/invoices}"
+                       class="btn btn-primary">
+                        Quay lại hóa đơn
+                    </a>
+                                        <form th:action="@{/student/invoices/confirm-paid}" method="post"
+                          style="display: inline-block; margin-left: 8px;">
+
+                        <input type="hidden" name="invoiceIds"
+                               th:each="inv : ${selectedInvoices}" th:value="${inv.id}">
+                        <input type="hidden" name="paymentCode" th:value="${paymentCode}">
+
+                        <button type="submit" class="btn btn-success"
+                                onclick="return confirm('Xác nhận bạn đã thanh toán các hóa đơn này?');">
+                            Tôi đã thanh toán
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    const qrBox = document.getElementById("qrBox");
+    new QRCode(qrBox, {
+        text: qrBox.dataset.content,
+        width: 200,
+        height: 200,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+    });
+</script>
+</body>
+</html>

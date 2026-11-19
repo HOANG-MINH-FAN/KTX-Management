@@ -1,8 +1,12 @@
 package com.dormitory.exchange.service;
 
+import com.dormitory.exchange.entity.ExchangeItem;
 import com.dormitory.exchange.repository.ExchangeItemRepository;
 import com.dormitory.exchange.repository.ExchangeRequestRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 public class ExchangeStatsService {
@@ -29,5 +33,15 @@ public class ExchangeStatsService {
     public long reusedItems() {
         return itemRepository.findByStatus("SOLD").size()
              + itemRepository.findByStatus("EXCHANGED").size();
+    }
+
+    /** Số tin đăng theo từng danh mục, ví dụ {"Sách"=9, "Điện tử"=15}. */
+    public Map<String, Long> itemsByCategory() {
+        Map<String, Long> result = new LinkedHashMap<>();
+        for (ExchangeItem item : itemRepository.findAll()) {
+            String key = (item.getCategory() == null) ? "Khác" : item.getCategory();
+            result.put(key, result.getOrDefault(key, 0L) + 1);
+        }
+        return result;
     }
 }

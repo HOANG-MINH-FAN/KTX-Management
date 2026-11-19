@@ -40,33 +40,32 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title"><i class="bi bi-info-circle"></i> Ghi chú chỉ số</span>
-                </div>
-                <div class="card-body">
-                    <div class="detail-list">
-                        <div class="detail-row">
-                            <span class="detail-label">Tổng tin đăng</span>
-                            <span class="text-secondary text-sm">Tổng số bản ghi trong bảng <code>exchange_items</code>.</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Tin đang hoạt động</span>
-                            <span class="text-secondary text-sm">Các tin đang mở công khai với trạng thái <code>AVAILABLE</code>.</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Giao dịch hoàn thành</span>
-                            <span class="text-secondary text-sm">Các yêu cầu giao dịch được cả 2 bên xác nhận <code>COMPLETED</code>.</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Đồ được tái sử dụng</span>
-                            <span class="text-secondary text-sm">Các món đồ đã chuyển sang trạng thái <code>SOLD</code> hoặc <code>EXCHANGED</code>.</span>
-                        </div>
-                    </div>
-                </div>
+            <h3 style="margin: 24px 0 12px;">Phân tích hoạt động</h3>
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header"><span class="card-title">Theo danh mục</span></div>
+                <div class="card-body" style="height: 300px;"><canvas id="categoryChart"></canvas></div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    const categoryData = /*[[${categoryStats}]]*/ {};
+
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(categoryData),
+            datasets: [{ data: Object.values(categoryData), backgroundColor: '#4f9cf9', borderRadius: 6 }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+</script>
 </body>
 </html>

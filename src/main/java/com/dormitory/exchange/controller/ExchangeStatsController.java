@@ -26,6 +26,7 @@ public class ExchangeStatsController {
         model.addAttribute("completed", statsService.completedTransactions());
         model.addAttribute("reused", statsService.reusedItems());
         model.addAttribute("pendingReports", reportService.countPending());
+        model.addAttribute("categoryStats", statsService.itemsByCategory());
         return "admin/exchange/stats";
     }
 }

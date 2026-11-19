@@ -1,46 +1,144 @@
+
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/sidebar :: head('Hóa đơn của tôi')}"></head>
 <body>
 <div class="layout">
     <div th:replace="~{layout/sidebar :: studentSidebar}"></div>
+
     <div class="main-content">
         <div class="topbar">
             <div>
-                <div class="topbar-title"><i class="bi bi-receipt"></i> Hóa đơn của tôi</div>
-                <div class="topbar-subtitle">Tra cứu tiền phòng, điện nước và trạng thái thanh toán</div>
+                <div class="topbar-title">
+                    <i class="bi bi-receipt"></i> Hóa đơn của tôi
+                </div>
+                <div class="topbar-subtitle">
+                    Tra cứu tiền phòng, điện nước và trạng thái thanh toán
+                </div>
             </div>
         </div>
+
         <div class="page-content">
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <!-- HOA DON CUA TOI -->
             <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Hóa đơn của tôi</span>
+                </div>
+
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Kỳ</th>
+                                <th>Chi tiết khoản phí</th>
                                 <th>Tổng tiền</th>
                                 <th>Hạn TT</th>
                                 <th>Trạng thái</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             <tr th:each="inv, i : ${invoices}">
                                 <td class="text-muted" th:text="${i.count}"></td>
-                                <td class="font-bold" th:text="'Tháng ' + ${inv.periodMonth} + '/' + ${inv.periodYear}"></td>
+
+                                <td class="font-bold"
+                                    th:text="'Tháng ' + ${inv.periodMonth} + '/' + ${inv.periodYear}">
+                                </td>
+
+                                    <td class="fee-detail-col">
+                                    <div class="fee-block" th:each="d : ${inv.details}"
+                                        th:with="type=${d.feeType.name()},
+                                                unit=${type == 'ELECTRICITY' ? 'kWh' : (type == 'WATER' ? 'm³' : 'tháng')}">
+
+                                        <!-- Hóa đơn cũ (chưa có share_count): giữ cách hiển thị cũ -->
+                                        <div th:if="${d.shareCount == null}">
+                                            <span th:text="${d.description}"></span>:
+                                            <strong th:text="${#numbers.formatDecimal(d.amount, 1, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                                        </div>
+
+                                        <!-- Hóa đơn mới: kiểu nhãn (cách C) -->
+                                        <th:block th:if="${d.shareCount != null}">
+
+                                            <div class="fee-name" th:switch="${type}">
+                                                <span th:case="'ROOM'">Tiền phòng</span>
+                                                <span th:case="'ELECTRICITY'">Tiền điện</span>
+                                                <span th:case="'WATER'">Tiền nước</span>
+                                                <span th:case="'SERVICE'">Phí dịch vụ</span>
+                                                <span th:case="*" th:text="${d.description}"></span>
+                                            </div>
+
+                                            <div class="fee-note" th:if="${type != 'ROOM'}" th:text="${d.description}"></div>
+
+                                            <!-- Dòng 1: chỉ số + đơn giá (không áp dụng cho phí dịch vụ) -->
+                                            <div class="fee-row" th:if="${type != 'SERVICE'}">
+                                                <span>
+                                                    <span class="fee-label" th:text="${type == 'ROOM' ? 'Thời gian:' : 'Chỉ số:'}"></span>
+                                                    <strong th:text="${#numbers.formatDecimal(d.quantity, 1, 'COMMA', 0, 'POINT')} + ' ' + ${unit}"></strong>
+                                                </span>
+                                                <span>
+                                                    <span class="fee-label">Đơn giá:</span>
+                                                    <strong th:text="${#numbers.formatDecimal(d.unitPrice, 1, 'COMMA', 0, 'POINT')} + ' đ/' + ${unit}"></strong>
+                                                </span>
+                                            </div>
+
+                                            <!-- Dòng 2 (khoản được chia): tổng phòng + phần của mình -->
+                                            <div class="fee-row" th:if="${d.shareCount > 1}">
+                                                <span>
+                                                    <span class="fee-label">Tổng phòng:</span>
+                                                    <strong th:text="${#numbers.formatDecimal(d.roomTotal, 1, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                                                </span>
+                                                <span class="fee-mine">
+                                                    <span class="fee-label" th:text="'Bạn trả (1/' + ${d.shareCount} + '):'"></span>
+                                                    <strong th:text="${#numbers.formatDecimal(d.amount, 1, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                                                </span>
+                                            </div>
+
+                                            <!-- Dòng 2 (khoản không chia, ví dụ tiền phòng) -->
+                                            <div class="fee-row" th:if="${d.shareCount <= 1}">
+                                                <span class="fee-mine">
+                                                    <span class="fee-label">Thành tiền:</span>
+                                                    <strong th:text="${#numbers.formatDecimal(d.amount, 1, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                                                </span>
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                </td>
+
                                 <td class="font-bold text-warning"
-                                    th:text="${#numbers.formatDecimal(inv.totalAmount,1,'COMMA',0,'POINT')} + ' đ'"></td>
+                                    th:text="${#numbers.formatDecimal(
+                                        inv.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' đ'">
+                                </td>
+
                                 <td th:text="${inv.dueDate}"></td>
+
                                 <td>
-                                    <span th:if="${inv.status?.name() == 'UNPAID'}"  class="badge badge-warning">Chưa thanh toán</span>
-                                    <span th:if="${inv.status?.name() == 'PAID'}"    class="badge badge-success">Đã thanh toán</span>
-                                    <span th:if="${inv.status?.name() == 'OVERDUE'}" class="badge badge-danger">Quá hạn</span>
+                                    <span th:if="${inv.status?.name() == 'UNPAID'}"
+                                          class="badge badge-warning">
+                                        Chưa thanh toán
+                                    </span>
+
+                                    <span th:if="${inv.status?.name() == 'PAID'}"
+                                          class="badge badge-success">
+                                        Đã thanh toán
+                                    </span>
+
+                                    <span th:if="${inv.status?.name() == 'OVERDUE'}"
+                                          class="badge badge-danger">
+                                        Quá hạn
+                                    </span>
                                 </td>
                             </tr>
+
                             <tr th:if="${#lists.isEmpty(invoices)}">
-                                <td colspan="5">
+                                <td colspan="6">
                                     <div class="empty-state">
-                                        <div class="icon"><i class="bi bi-receipt"></i></div>
+                                        <div class="icon">
+                                            <i class="bi bi-receipt"></i>
+                                        </div>
                                         <h3>Chưa có hóa đơn nào</h3>
                                     </div>
                                 </td>
@@ -49,8 +147,137 @@
                     </table>
                 </div>
             </div>
+
+            <!-- THANH TOAN HOA DON CA NHAN -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-body">
+                    <h3>Thanh toán hóa đơn cá nhân</h3>
+
+                    <p class="text-muted">
+                        Chọn hóa đơn cá nhân cần thanh toán.
+                        Chức năng QR sẽ được bổ sung ở Giai đoạn 3.
+                    </p>
+
+                    <form th:action="@{/student/invoices/checkout}" method="post">
+                        <div th:each="inv : ${invoices}"
+                             th:if="${inv.status?.name() == 'UNPAID'
+                                  or inv.status?.name() == 'OVERDUE'}">
+
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox"
+                                       name="invoiceIds"
+                                       th:value="${inv.id}"
+                                       th:attr="data-amount=${inv.totalAmount}"
+                                       class="personal-invoice-checkbox">
+
+                                Tháng
+                                <span th:text="${inv.periodMonth}"></span>/
+                                <span th:text="${inv.periodYear}"></span>
+                                -
+                                <strong th:text="${#numbers.formatDecimal(
+                                    inv.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' đ'">
+                                </strong>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Thanh toán hóa đơn cá nhân
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- HOA DON THANH VIEN CUNG PHONG -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <span class="card-title">
+                        Hóa đơn chưa thanh toán của thành viên cùng phòng
+                    </span>
+                </div>
+
+                <div class="card-body">
+
+                    <form th:action="@{/student/invoices/checkout}" method="post">
+
+                        <div th:each="inv : ${roomInvoices}"
+                             th:if="${inv.contract.student.id != studentId}">
+
+                            <label style="display: block; margin-bottom: 12px;">
+                                <input type="checkbox"
+                                       name="invoiceIds"
+                                       th:value="${inv.id}"
+                                       th:attr="data-amount=${inv.totalAmount}"
+                                       class="room-invoice-checkbox">
+
+                                <span th:text="${inv.contract.student.fullName}"></span>
+                                -
+                                Tháng
+                                <span th:text="${inv.periodMonth}"></span>/
+                                <span th:text="${inv.periodYear}"></span>
+
+                                <strong th:text="${#numbers.formatDecimal(
+                                    inv.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' đ'">
+                                </strong>
+                            </label>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(roomInvoices)}"
+                             class="empty-state">
+                            <p>Không có hóa đơn chưa thanh toán trong phòng.</p>
+                        </div>
+
+                        <hr>
+
+                        <!-- TONG TIEN THANH TOAN HO -->
+                        <div style="margin: 16px 0;">
+                            <strong>Tổng tiền đã chọn:</strong>
+
+                            <span id="totalAmount"
+                                  class="font-bold text-warning"
+                                  style="font-size: 22px;">
+                                0 đ
+                            </span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Thanh toán các hóa đơn đã chọn
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+<!-- CAP NHAT TONG TIEN THANH TOAN HO -->
+<script>
+    const checkboxes = document.querySelectorAll(
+        ".room-invoice-checkbox"
+    );
+
+    const totalElement = document.getElementById("totalAmount");
+
+    function updateTotal() {
+        let total = 0;
+
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                total += Number(checkbox.dataset.amount);
+            }
+        });
+
+        totalElement.innerText =
+            total.toLocaleString("vi-VN") + " đ";
+    }
+
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener("change", updateTotal);
+    });
+
+    updateTotal();
+</script>
+
 </body>
 </html>

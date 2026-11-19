@@ -20,6 +20,10 @@ public interface InvoiceService {
     /** Lấy hóa đơn của sinh viên. */
     List<Invoice> findByStudentId(Long studentId);
 
+    List<Invoice> validateStudentPayment(Long studentId, List<Long> invoiceIds);
+
+    List<Invoice> findUnpaidInvoicesByRoomId(Long roomId);
+
     /** Hóa đơn chưa thanh toán. */
     List<Invoice> findUnpaidInvoices();
 
@@ -46,10 +50,27 @@ public interface InvoiceService {
                           BigDecimal pricePerKwh, BigDecimal pricePerM3,
                           BigDecimal serviceFeeAmount);
 
+                          /**
+     * Tạo hóa đơn cho toàn bộ sinh viên đang ở trong một phòng.
+     * Tiền điện, nước và dịch vụ được chia đều.
+     */
+    List<Invoice> createInvoicesForRoom(
+        Long roomId, int month, int year,
+        int prevElecReading, int currElecReading,
+        int prevWaterReading, int currWaterReading,
+        BigDecimal pricePerKwh, BigDecimal pricePerM3,
+        BigDecimal serviceFeeAmount);
     /**
      * Ghi nhận thanh toán hóa đơn. Nếu đủ tiền → status = PAID.
      */
+    
     void recordPayment(Long invoiceId, BigDecimal amountPaid, String paymentMethod, String note);
+     
+        /**
+     * Sinh viên xác nhận đã thanh toán các hóa đơn đã chọn.
+     * Tất cả hóa đơn được ghi nhận trong một giao dịch: lỗi một cái thì hủy hết.
+     */
+    void confirmStudentPayment(Long studentId, List<Long> invoiceIds, String paymentCode);
 
     /** Tổng nợ chưa thanh toán. */
     BigDecimal getTotalUnpaidAmount();
